@@ -214,7 +214,11 @@ const HUSH = `
       </g>
     </g>
     <g id="hHand">
-      <path d="M-50,196 C-26,164 0,132 20,110 L46,134 C22,156 0,184 -16,214Z" fill="#141220"/>
+      <!-- a wide sleeve, open at the wrist, its cloth hanging down below the forearm -->
+      <path d="M16,100 C-10,116 -50,144 -90,174 L-112,272 C-60,290 -4,282 24,258 C54,232 64,182 54,140Z" fill="#141220"/>
+      <path d="M16,100 L54,140 C64,182 54,232 24,258 C-4,282 -60,290 -112,272" stroke="#2a2536" stroke-width="4" fill="none" stroke-linejoin="round"/>
+      <path d="M16,100 L54,140 C64,182 54,232 24,258" class="hw" stroke="#6a3a24" stroke-width="4" fill="none" opacity="0"/>
+      <path d="M-30,150 C-36,190 -40,230 -50,272 M10,140 C8,180 0,220 -14,262" stroke="#1f1c2c" stroke-width="4" fill="none" stroke-linecap="round"/>
       <path d="M18,110 C34,100 54,94 70,96 C80,98 84,106 80,114 C76,124 54,132 30,134Z" fill="#4c362e"/>
       <path d="M56,95 C70,94 82,100 80,114 C74,110 66,104 56,95Z" class="hw" fill="#b06e3e" opacity="0"/>
       <path d="M48,101 C58,96 68,94 76,96 M52,109 C62,104 72,102 80,104 M54,117 C64,113 72,112 79,113" stroke="#2e1f19" stroke-width="2" fill="none" stroke-linecap="round"/>
