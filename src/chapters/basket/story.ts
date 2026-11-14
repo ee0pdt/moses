@@ -36,7 +36,7 @@ export async function story(X: Scene) {
 
   // 3 · his sister creeps to the lamp, reaches up on tiptoe, and pinches it out
   await miriam.toPose('stand', 350);
-  await walkTo(S.mi, LAMP_X + 12, 64);
+  await walkTo(S.mi, LAMP_X + 12, 92);
   miriam.toPose('snuff', 450); await tween(S.mi, { hop: 6 }, 450, out);
   await wait(200);
   sfx.snuff(); tween(S, { lamp: 0 }, 240, out); S.smoke = 1; tween(S, { smoke: 0 }, 2800);
@@ -44,7 +44,7 @@ export async function story(X: Scene) {
   tween(S, { march: 1, torch: 1 }, 1500); const passing = tween(S, { patrol: -30 }, 3400, lin);
   await wait(400);
   tween(S.mi, { hop: 0 }, 300); miriam.toPose('stand', 300); await wait(250);
-  await walkTo(S.mi, -132, 60); miriam.toPose('hide', 600);
+  await walkTo(S.mi, 30, 96); S.mi.f = -1; miriam.toPose('hide', 500);
   await passing;
   // they stop at the window; the torch is lifted to look in
   tween(S, { march: 0 }, 250);
@@ -54,7 +54,7 @@ export async function story(X: Scene) {
 
   // close on her face: eyes on the window, then shut; the baby frets; she holds him to her cheek
   Object.assign(S, { look: 1, eyeLid: 0, bow: .3, shh: 0, fuss: 0 });
-  cut(X.hcam, { w: 640, pw: 440 }); show(I.hush, true); tween(X.hcam, { w: 560, pw: 400 }, 9000, lin);
+  cut(X.hcam, { w: 650, pw: 440 }); show(I.hush, true); tween(X.hcam, { w: 590, pw: 400 }, 9000, lin);
   sfx.heartbeat(); await wait(1100);
   tween(S, { eyeLid: 1, look: .2 }, 700); sfx.heartbeat(); await wait(1000);
   tween(S, { fuss: 1 }, 300); sfx.whimper();
@@ -96,10 +96,12 @@ export async function story(X: Scene) {
   at(I.wRing, 'cy', 50);
   await tap([I.wHit], I.wRing, { delay: 2600, stray: 1 });
   { const stop = every(380, sfx.daub); await tween(S, { pitch: 1 }, 2400, io); stop(); }
-  await wait(400); tween(S, { handOut: 1 }, 1100, inn); await wait(700);
-  // she lays the child in it
-  sfx.coo(); await tween(S, { babyIn: 1 }, 2800, io);
-  sfx.lullaby(.04, 0, 1); await wait(2200);
+  await wait(400); await tween(S, { handOut: 1 }, 1100, inn);
+  // she lays the child in it, lowering him in both hands, and lets go
+  S.cradle = 1; await wait(300);
+  sfx.coo(); await tween(S, { babyIn: 1 }, 3000, io);
+  await wait(600); tween(S, { cradle: 0 }, 1400, io);
+  sfx.lullaby(.04, 0, 1); await wait(1800);
   at(I.wRing, 'cy', -40);
   await tap([I.wHit], I.wRing, { delay: 3000, stray: 1 });
   await tween(S, { lid: 1 }, 1100, inn); sfx.thump(); await wait(1500);
