@@ -46,6 +46,13 @@ export const POSES = {
   bow: { ...ST, t: 28, h: 14, aFx: 14, aFy: -44, aBx: 8, aBy: -42, ab: 1 },
   look: { ...ST, t: -3, h: -8, aFx: 6, aFy: -52 },
   bless: { ...ST, t: -2, h: 4, aFx: 24, aFy: -98 },
+  // the house in Goshen
+  hush: { ...KN, t: 16, h: 30, aFx: 14, aFy: -54, aBx: 6, aBy: -50, ab: 1 },     // baby lifted to her cheek
+  snuff: { ...ST, t: -6, h: -16, fFx: 6, fBx: -4, aFx: 15, aFy: -116 },             // on tiptoe, reaching up
+  spear: { ...ST, aFx: 12, aFy: -54 },
+  torch: { ...ST, aFx: 22, aFy: -74 },
+  peer: { ...ST, t: 9, h: 12, aFx: 30, aFy: -100 },                                // torch held up to a window
+  waveOn: { ...ST, t: -3, h: -6, aFx: 34, aFy: -86 },
 } satisfies Record<string, Pose>;
 export type PoseName = keyof typeof POSES;
 
@@ -64,6 +71,8 @@ export interface FigureStyle {
   rim?: string;
   /** Hint ring, in figure units. */
   ring?: [number, number, number];
+  /** Fullness of the front of the robe below the chest (figure units). */
+  belly?: number;
 }
 
 const RT = (a: number, x: number, y: number): [number, number] => {
@@ -83,7 +92,7 @@ function ik(ax: number, ay: number, bx: number, by: number, l1: number, l2: numb
 let uid = 0;
 
 export function createFigure(defs: SVGDefsElement, style: FigureStyle) {
-  const id = `fig-def-${++uid}`, sc = style.scale ?? 1;
+  const id = `fig-def-${++uid}`, sc = style.scale ?? 1, bel = style.belly ?? 0;
   const def = el('g', { id }, defs);
   def.innerHTML = `
     <path data-r="legs" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
@@ -107,6 +116,8 @@ export function createFigure(defs: SVGDefsElement, style: FigureStyle) {
   const hit = el('rect', { x: -42, y: -130, width: 100, height: 140, class: 'hit' }, body);
 
   const P: Pose = { ...ST };
+  /** Front hand, in figure units; `hand` on the api is the same point in parent units. */
+  const hand = [0, 0], handW = { x: 0, y: 0 };
 
   function rig(m: Motion, propOn: boolean) {
     const p = P, wk = m.walk ? 1 : 0, w = wk * Math.sin(m.ph), c = wk * Math.cos(m.ph);
@@ -119,7 +130,7 @@ export function createFigure(defs: SVGDefsElement, style: FigureStyle) {
     footB.setAttribute('cx', f1(fB[0])); footB.setAttribute('cy', f1(fB[1] - 1));
     // robe
     const xs = [fF[0], fB[0]]; if (kF[1] > -16) xs.push(kF[0] - 7); if (kB[1] > -16) xs.push(kB[0] - 7);
-    const a = RT(th, -12, 3), b = RT(th, 12, 3), e = RT(th / 2, -21, 0), g = RT(th / 2, 20, 0);
+    const a = RT(th, -12, 3), b = RT(th, 12, 3), e = RT(th / 2, -21, 0), g = RT(th / 2, 20 + bel, -bel * .8);
     const Sb = [N[0] + a[0], N[1] + a[1]], Sf = [N[0] + b[0], N[1] + b[1]], Hb = [hx + e[0], hy + e[1]], Hf = [hx + g[0], hy + g[1]];
     const HB = [Math.min(Math.min(...xs) - 14, Hb[0] + 2), -2], HF = [Math.max(...xs) + 10, -2];
     const cr = (A: number[], B: number[], C: number[]) =>
@@ -130,7 +141,8 @@ export function createFigure(defs: SVGDefsElement, style: FigureStyle) {
     const hc = RT(th + p.h, 3, -11);
     head.setAttribute('transform', `translate(${f1(N[0] + hc[0])},${f1(N[1] + hc[1])}) rotate(${f1(th + p.h)})`);
     tail?.setAttribute('transform', `rotate(${f1(-(th + p.h) * .65)} -9 -1)`);
-    const aF = ik(S[0], S[1], p.aFx + w * 3, p.aFy, 18, 18, 1), aB = ik(S[0], S[1], p.aBx, p.aBy, 18, 18, 1);
+    const aF = ik(S[0], S[1], p.aFx + w * 3, p.aFy, 18, 18, 1); hand[0] = aF[2]; hand[1] = aF[3];
+    const aB = ik(S[0], S[1], p.aBx, p.aBy, 18, 18, 1);
     armF.setAttribute('d', `M${f1(S[0])},${f1(S[1])}L${f1(aF[0])},${f1(aF[1])}L${f1(aF[2])},${f1(aF[3])}`);
     armB.setAttribute('d', p.ab > .5 ? `M${f1(S[0])},${f1(S[1])}L${f1(aB[0])},${f1(aB[1])}L${f1(aB[2])},${f1(aB[3])}` : '');
     prop.setAttribute('display', propOn ? 'inline' : 'none');
@@ -139,7 +151,11 @@ export function createFigure(defs: SVGDefsElement, style: FigureStyle) {
 
   const api = {
     root, ring, hit, P,
+    /** Where the front hand was last drawn, in the parent's units. */
+    hand: handW,
     propOn: !!style.prop,
+    /** A `data-r` part of the head or prop art (look up once, at build time). */
+    part: (k: string) => def.querySelector(`[data-r="${k}"]`) as SVGElement | null,
     /** Swap what is in the front hand. */
     setProp(markup: string) { prop.innerHTML = markup; },
     toPose(name: PoseName, ms = 0, ease: Ease = io): Promise<void> {
@@ -161,6 +177,7 @@ export function createFigure(defs: SVGDefsElement, style: FigureStyle) {
       rimU.setAttribute('transform', `translate(2.6,-.6) scale(${m.f},1)`);
       rimU.setAttribute('opacity', (m.rim * (.75 + .25 * fl)).toFixed(3));
       rig(m, api.propOn);
+      handW.x = m.x + m.f * sc * hand[0]; handW.y = m.y - bob - m.hop + sc * hand[1];
     },
   };
   return api;

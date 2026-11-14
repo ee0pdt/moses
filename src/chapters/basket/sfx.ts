@@ -21,6 +21,8 @@ export const makeSfx = (a: AudioEngine) => ({
     a.tn(540, .7, { type: 'sawtooth', f2: 380, g, a: .03, trem: 8, lp: 1500, rv: .25, when: when + .5 });
   },
   whimper: () => a.tn(470, .35, { type: 'sawtooth', f2: 400, g: .025, a: .06, trem: 10, lp: 1300, rv: .3 }),
+  /** The mother's "shh": breath through the teeth. */
+  shh: (g = .05) => a.nz(.9, { type: 'highpass', f: 3200, g, a: .18, rv: .2 }),
   coo: () => { a.tn(520, .22, { f2: 760, g: .045, a: .03, rv: .4 }); a.tn(760, .25, { f2: 600, g: .035, when: .22, rv: .4 }); },
   /** A harp arpeggio: the court of Pharaoh. */
   harp(root = 293.66, when = 0) {

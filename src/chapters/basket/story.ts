@@ -4,14 +4,14 @@ import { tween, wait, cut, every } from '../../engine/tween';
 import { walkTo } from '../../characters/figure';
 import { PROPS } from '../../characters/moses';
 import type { Scene } from './scene';
-import { RB, BANK, WATER, HIDE1, HIDE2, REST } from './world';
+import { RB, BANK, WATER, HIDE1, HIDE2, REST, LAMP_X } from './world';
 
 /**
  * Exodus 1:22 – 2:10, as a script. Each `await` is a beat; `tap` is where the
  * film waits for the viewer.
  */
 export async function story(X: Scene) {
-  const { S, W, I, sfx, ctx, cast } = X;
+  const { S, W, I, sfx, ctx, cast, soldiers } = X;
   const { tap } = ctx.input;
   const { mother, miriam, princess, maid1 } = cast;
   const cam = () => X.cam;
@@ -26,22 +26,51 @@ export async function story(X: Scene) {
 
   // 2 · "Every son that is born ye shall cast into the river" (1:22) — soldiers in the street
   tween(S, { march: .45, torch: .55 }, 3000); tween(S, { patrol: -260 }, 5600, lin);
+  tween(cam(), { x: 0, pw: 660 }, 4000);                         // on a phone, bring the window into frame
   await wait(1500);
-  tween(S, { rock: 0 }, 700); tween(mother.P, { h: -4 }, 700);
-  sfx.whimper(); await wait(1400); sfx.whimper();
+  // the baby stirs at the noise; she rocks him closer and hushes him; his sister looks up
+  tween(miriam.P, { h: -14 }, 600);
+  mother.toPose('hush', 900); tween(S, { hush: 1 }, 900);
+  sfx.whimper(); await wait(500); sfx.shh(); await wait(1000); sfx.whimper(); sfx.shh(.04);
   await tap([W.lampHit], W.lampRing, { delay: 2600, stray: 3 });
 
-  // 3 · she puts out the lamp and hides him
+  // 3 · his sister creeps to the lamp, reaches up on tiptoe, and pinches it out
+  await miriam.toPose('stand', 350);
+  await walkTo(S.mi, LAMP_X + 12, 64);
+  miriam.toPose('snuff', 450); await tween(S.mi, { hop: 6 }, 450, out);
+  await wait(200);
   sfx.snuff(); tween(S, { lamp: 0 }, 240, out); S.smoke = 1; tween(S, { smoke: 0 }, 2800);
   X.palette('dark', .8);
-  mother.toPose('hunch', 800);
-  tween(S, { march: 1, torch: 1 }, 1500); await tween(S, { patrol: -30 }, 3400, lin);
-  // they stop at the window
+  tween(S, { march: 1, torch: 1 }, 1500); const passing = tween(S, { patrol: -30 }, 3400, lin);
+  await wait(400);
+  tween(S.mi, { hop: 0 }, 300); miriam.toPose('stand', 300); await wait(250);
+  await walkTo(S.mi, -132, 60); miriam.toPose('hide', 600);
+  await passing;
+  // they stop at the window; the torch is lifted to look in
   tween(S, { march: 0 }, 250);
-  await wait(500); sfx.heartbeat(); await wait(1100); sfx.heartbeat(); await wait(1100); sfx.heartbeat(); await wait(1000);
-  // and move on
+  await wait(500);
+  soldiers[1].toPose('peer', 1000); tween(S, { peer: 1 }, 1000);
+  await wait(1300);
+
+  // close on her face: eyes on the window, then shut; the baby frets; she holds him to her cheek
+  Object.assign(S, { look: 1, eyeLid: 0, bow: .3, shh: 0, fuss: 0 });
+  cut(X.hcam, { w: 640, pw: 440 }); show(I.hush, true); tween(X.hcam, { w: 560, pw: 400 }, 9000, lin);
+  sfx.heartbeat(); await wait(1100);
+  tween(S, { eyeLid: 1, look: .2 }, 700); sfx.heartbeat(); await wait(1000);
+  tween(S, { fuss: 1 }, 300); sfx.whimper();
+  tween(S, { bow: 1, shh: 1 }, 700); sfx.shh(); await wait(900);
+  sfx.heartbeat(); tween(S, { fuss: 0 }, 1400); await wait(1100);
+  // a soldier waves them on; the torch comes down
+  soldiers[0].toPose('waveOn', 600); soldiers[1].toPose('torch', 900); tween(S, { peer: 0 }, 900);
+  await wait(700); soldiers[0].toPose('spear', 600);
   tween(S, { march: 1 }, 300); tween(S, { patrol: 560 }, 5400, lin); tween(S, { torch: 0 }, 5400, inn);
-  await wait(3800); tween(S, { march: 0 }, 1600); await wait(1800);
+  await wait(900); tween(S, { eyeLid: 0, shh: 0 }, 900); tween(S, { look: 1 }, 1200);
+  await wait(1700);
+  show(I.hush, false);
+  // and they are gone
+  await wait(1200); tween(S, { march: 0 }, 1600);
+  tween(S, { hush: 0 }, 2000); miriam.toPose('kneel', 1400); tween(miriam.P, { h: 0 }, 1400);
+  await wait(1800);
 
   // 4 · "she hid him three months" (2:2)
   await mother.toPose('sitCradle', 1500); tween(S, { rock: .6 }, 1200);
@@ -83,7 +112,7 @@ export async function story(X: Scene) {
   S.rock = 0;
   Object.assign(S.mo, { x: RB - 1150, y: 632, f: 1, rim: .35, lean: 0 });
   mother.setProp(PROPS.basket); mother.propOn = true; mother.toPose('carry');
-  Object.assign(S.mi, { x: RB - 1250, rim: .3 });
+  Object.assign(S.mi, { x: RB - 1250, y: BANK, f: 1, hop: 0, rim: .3 }); miriam.toPose('stand');
   tween(S, { black: 0 }, 2600);
   walkTo(S.mi, RB - 300, 46); tween(cam(), { x: RB - 300 }, 8000);
   await walkTo(S.mo, RB - 170, 46);
