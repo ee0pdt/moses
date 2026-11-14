@@ -8,6 +8,7 @@ import { AudioEngine, SILENCE } from './engine/audio';
 import { createInput } from './engine/input';
 import type { Chapter, ChapterCtx } from './chapters/types';
 import { CHAPTERS } from './chapters';
+import { bindFullscreenButton, enterFullscreen } from './engine/fullscreen';
 
 /*
  * The shell: start screen → chapter menu → a chapter → (replay | menu).
@@ -75,6 +76,7 @@ CHAPTERS.forEach((ch, i) => {
 
 start.addEventListener('pointerdown', () => {
   audio.init();
+  if (!new URLSearchParams(location.search).has('auto')) enterFullscreen();
   start.style.opacity = '0';
   start.style.pointerEvents = 'none';
   setTimeout(() => start.remove(), 1700);
@@ -93,6 +95,7 @@ again.addEventListener('click', async () => {
 });
 
 menuBtn.addEventListener('click', showMenu);
+bindFullscreenButton($('#fs'));
 
 mute.addEventListener('click', () => {
   audio.setMuted(!audio.muted);
