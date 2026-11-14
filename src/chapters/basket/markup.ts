@@ -131,11 +131,11 @@ const OPEN = `
 /* insert: the mother's face as the soldiers stop at the window (Exodus 2:2).
    Cool night tones; the warm copies (class hw) fade in with the torchlight from the right. */
 // her profile, facing right: forehead, brow, a long nose, full lips, chin, jaw
-const PROFILE = 'C56,-206 72,-190 76,-166 C79,-152 80,-142 78,-134 C77,-128 80,-122 85,-114 C93,-103 104,-92 110,-80 C112,-74 106,-70 98,-71 C95,-71 93,-68 94,-64 C99,-62 103,-58 100,-54 C97,-52 96,-51 97,-49 C102,-46 100,-39 94,-37 C91,-35 91,-32 93,-28 C96,-20 92,-9 80,-6';
+const PROFILE = 'C56,-206 72,-190 76,-166 C79,-152 80,-142 78,-134 C77,-128 80,-122 85,-114 C93,-103 104,-92 110,-80 C112,-74 106,-70 98,-71 C95,-71 93,-68 93,-64 C96,-62 98.5,-58 96.5,-54 C94.5,-52 93.5,-51 94,-49 C97,-46 96,-40 92,-37 C91,-35 91,-32 93,-28 C96,-20 92,-9 80,-6';
 const FACE_D = `M30,-206 ${PROFILE} C62,-2 40,-10 22,-30 C6,-50 -6,-100 -4,-150 C-2,-180 10,-200 30,-206Z`;
 const LIT_D = `M30,-206 ${PROFILE} C70,-22 64,-44 68,-62 C71,-80 62,-96 63,-112 C60,-140 60,-176 30,-206Z`;
 const LID_D = 'M54,-136 C64,-141 77,-138 83,-127 L81,-121 C74,-116 64,-114 57,-119Z';
-const LIPS_D = 'M94,-64 C99,-62 103,-58 100,-54 C97,-52 95,-52 92,-53Z M97,-49 C102,-46 100,-39 94,-37 C92,-42 93,-47 97,-49Z';
+const LIPS_D = 'M93,-64 C96,-62 98.5,-58 96.5,-54 C94.5,-52 92.5,-52 90.5,-53Z M94,-49 C97,-46 96,-40 92,-37 C90,-42 91,-47 94,-49Z';
 const SWADDLE_D = 'M152,52 C176,86 156,130 104,160 C42,196 -40,212 -82,190 C-104,160 -62,118 0,100 C52,84 104,52 152,52Z';
 const HUSH = `
 <svg id="hush" class="full" preserveAspectRatio="none" style="display:none" aria-hidden="true">
@@ -159,6 +159,9 @@ const HUSH = `
       <path d="${LIT_D}" class="hw" fill="#b06e3e" opacity="0"/>
       <!-- the cheekbone catching the light -->
       <path d="M60,-106 C68,-104 76,-100 78,-92 C70,-92 62,-96 60,-106Z" class="hw" fill="#d08a52" opacity="0"/>
+      <!-- the eye sits back in its socket, behind the bridge of the nose -->
+      <path d="M60,-136 C66,-128 70,-120 68,-108 C62,-112 58,-120 56,-130Z" fill="#2e1f19" opacity=".55"/>
+      <g transform="translate(-14,1)">
       <!-- tired: the shadow beneath the eye -->
       <path d="M57,-114 C64,-108 72,-108 80,-116 C75,-106 64,-104 55,-110Z" fill="#20140f" opacity=".75"/>
       <!-- the eye: dark iris, lined with kohl -->
@@ -172,11 +175,12 @@ const HUSH = `
       </g>
       <path d="M56,-131 C64,-137 76,-136 82,-128" stroke="#24150f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
       <path d="M48,-141 C58,-151 74,-152 86,-141 C76,-146 62,-146 50,-138Z" fill="#0f0806"/>
+      </g>
       <path d="M96,-76 C99,-73 101,-73 103,-75" stroke="#1e110c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
       <g id="hLips">
         <path d="${LIPS_D}" fill="#5a3029"/>
         <path d="${LIPS_D}" class="hw" fill="#94493a" opacity="0"/>
-        <path d="M92,-53 C95,-51 97,-51 99,-52" stroke="#1a0c0a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <path d="M90,-53 C92,-51 94,-51 95.5,-52" stroke="#1a0c0a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
       </g>
       <!-- dark hair parted under the veil, and loose strands across the temple -->
       <path d="M10,-216 C40,-222 66,-212 80,-197 C66,-200 50,-198 38,-192 C30,-178 24,-162 21,-142 C14,-160 6,-178 0,-186Z" fill="#0f0907"/>
