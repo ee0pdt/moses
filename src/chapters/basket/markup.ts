@@ -195,6 +195,10 @@ const HUSH = `
     <path d="M-16,76 C12,44 40,34 66,32 C88,31 104,38 114,48 L114,140 L-16,140Z" fill="#141220"/>
     <path d="M-16,76 C12,44 40,34 66,32 C88,31 104,38 114,48" stroke="#2a2536" stroke-width="5" fill="none"/>
     <g transform="translate(-10,-40)">
+    <!-- the cradling arm: round behind his head and along beneath him -->
+    <path d="M140,30 C186,44 214,96 206,140 C198,180 150,206 90,226 C40,242 -20,250 -70,244 L-74,220 C-24,224 34,212 82,196 C136,178 174,156 182,128 C188,98 174,66 138,50Z" fill="#141220"/>
+    <path d="M140,30 C186,44 214,96 206,140 C198,180 150,206 90,226" stroke="#2a2536" stroke-width="4" fill="none"/>
+    <path d="M140,30 C186,44 214,96 206,140 C198,180 150,206 90,226" class="hw" stroke="#6a3a24" stroke-width="4" fill="none" opacity="0"/>
     <g id="hBaby">
       <path d="${SWADDLE_D}" fill="#3e3b4c"/>
       <path d="${SWADDLE_D}" class="hw" fill="#a8916e" opacity="0"/>
@@ -210,11 +214,14 @@ const HUSH = `
       </g>
     </g>
     <g id="hHand">
-      <path d="M-220,420 L-40,190 L20,112 L46,134 L-20,232 L-80,420Z" fill="#141220"/>
+      <path d="M-50,196 C-26,164 0,132 20,110 L46,134 C22,156 0,184 -16,214Z" fill="#141220"/>
       <path d="M18,110 C34,100 54,94 70,96 C80,98 84,106 80,114 C76,124 54,132 30,134Z" fill="#4c362e"/>
       <path d="M56,95 C70,94 82,100 80,114 C74,110 66,104 56,95Z" class="hw" fill="#b06e3e" opacity="0"/>
       <path d="M48,101 C58,96 68,94 76,96 M52,109 C62,104 72,102 80,104 M54,117 C64,113 72,112 79,113" stroke="#2e1f19" stroke-width="2" fill="none" stroke-linecap="round"/>
     </g>
+    <!-- a fold of her robe drawn over him -->
+    <path d="M-420,150 C-300,112 -200,112 -150,124 C-96,138 -40,170 -4,212 C12,232 20,254 18,400 L-420,400Z" fill="#191726"/>
+    <path d="M-150,124 C-96,138 -40,170 -4,212 C12,232 20,254 18,300" stroke="#2a2536" stroke-width="4" fill="none"/>
     </g>
   </g>
 </svg>`;
