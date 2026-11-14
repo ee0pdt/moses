@@ -131,7 +131,7 @@ const OPEN = `
 /* insert: the mother's face as the soldiers stop at the window (Exodus 2:2).
    Cool night tones; the warm copies (class hw) fade in with the torchlight from the right. */
 // her profile, facing right: forehead, brow, a long nose, full lips, chin, jaw
-const PROFILE = 'C56,-206 72,-192 77,-170 C81,-158 85,-149 84,-142 C82,-135 74,-132 72,-127 C73,-117 83,-105 91,-95 C96,-90 100.5,-87 100.5,-82 C100.5,-77 97,-75.5 93.5,-75.5 C91.5,-75.5 90.5,-73 91.5,-70 C95,-68 97,-64 95,-60 C93,-58 92,-57.5 92.5,-56 C95,-53 94,-47 90,-45 C88,-43 88,-40 89,-36 C92,-28 88,-17 77,-14';
+const PROFILE = 'C56,-206 72,-192 77,-170 C81,-158 85,-149 84,-142 C82,-135 74,-132 72,-127 C73,-118 82,-109 90,-100 C95,-95 99.5,-92 99.5,-87.5 C99.5,-83 96.5,-81.5 93,-81.5 C91,-81.5 90,-79 90.5,-76 C92,-73 92.5,-71.5 92,-70 C95,-68 97,-64 95,-60 C93,-58 92,-57.5 92.5,-56 C95,-53 94,-47 90,-45 C88,-43 88,-40 89,-36 C92,-28 88,-17 77,-14';
 const FACE_D = `M30,-206 ${PROFILE} C60,-10 40,-16 22,-34 C6,-52 -6,-100 -4,-150 C-2,-180 10,-200 30,-206Z`;
 const LIT_D = `M30,-206 ${PROFILE} C70,-28 64,-48 67,-64 C70,-80 62,-96 63,-112 C60,-140 60,-176 30,-206Z`;
 const LID_D = 'M54,-136 C64,-141 77,-138 83,-127 L81,-121 C74,-116 64,-114 57,-119Z';
@@ -176,7 +176,7 @@ const HUSH = `
       <path d="M56,-131 C64,-137 76,-136 82,-128" stroke="#24150f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
       <path d="M48,-141 C58,-151 74,-152 86,-141 C76,-146 62,-146 50,-138Z" fill="#0f0806"/>
       </g>
-      <path d="M89,-79.5 C91.5,-77 93.5,-77 95,-78.5" stroke="#1e110c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M88.5,-85.5 C91,-83 93,-83 94.5,-84.5" stroke="#1e110c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
       <g id="hLips">
         <path d="${LIPS_D}" fill="#5a3029"/>
         <path d="${LIPS_D}" class="hw" fill="#94493a" opacity="0"/>
