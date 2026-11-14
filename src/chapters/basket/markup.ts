@@ -151,8 +151,8 @@ const HUSH = `
     <path d="M-40,62 C10,30 72,24 104,40 C164,72 214,172 240,420 L-90,420Z" fill="#141220"/>
     <path d="M-40,62 C10,34 60,30 90,36 C60,44 20,52 -20,74Z" fill="#2a2536"/>
     <g id="hHead">
-      <path d="M-7.2,-46 C10,-28 36,-20 52,-21 C52,4 54,30 58,56 L4,70 C8,30 4,-10 -0.5,-46Z" fill="#33231d"/>
-      <path d="M52,-21 C52,4 54,30 58,56 L46,58 C42,32 40,6 40,-18Z" class="hw" fill="#7a4626" opacity="0"/>
+      <path d="M-24,-50 C-4,-36 14,-30 27,-30 C27,0 29,30 33,56 L-21,70 C-17,30 -21,-10 -24,-50Z" fill="#33231d"/>
+      <path d="M27,-30 C27,0 29,30 33,56 L21,58 C17,32 15,4 15,-28Z" class="hw" fill="#7a4626" opacity="0"/>
       <path d="${FACE_D}" fill="#4c362e"/>
       <path d="${LIT_D}" fill="#5e4438"/>
       <path d="${FACE_D}" class="hw" fill="#7c4a2c" opacity="0"/>
@@ -182,12 +182,9 @@ const HUSH = `
         <path d="${LIPS_D}" class="hw" fill="#94493a" opacity="0"/>
         <path d="M77.1,-58 C78.8,-57 79.8,-57 81,-57.5" stroke="#1a0c0a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
       </g>
-      <!-- dark hair parted under the veil, and loose strands across the temple -->
-      <path d="M10,-216 C40,-222 66,-212 80,-197 C66,-200 50,-198 38,-192 C30,-178 24,-162 21,-142 C14,-160 6,-178 0,-186Z" fill="#0f0907"/>
-      <path d="M38,-192 C46,-176 38,-160 47,-142 M30,-186 C26,-168 32,-152 26,-132" stroke="#0f0907" stroke-width="1.4" fill="none" stroke-linecap="round"/>
       <!-- the veil over her head, framing the face -->
-      <path d="M6,-172 C-4,-130 -8,-80 2,-40 C8,-8 2,30 -12,72 L-70,72 C-62,0 -52,-120 -30,-196Z" fill="#211d2c"/>
-      <path d="M86,-198 C80,-236 32,-256 -20,-252 C-62,-250 -94,-230 -110,-202 C-62,-222 8,-228 86,-198Z" fill="#2b2638"/>
+      <path d="M46,-206 C26,-198 10,-178 4,-150 C-4,-120 -8,-80 2,-40 C8,-8 2,30 -12,72 L-70,72 C-62,0 -52,-120 -30,-204Z" fill="#211d2c"/>
+      <path d="M86,-198 C80,-236 32,-256 -20,-252 C-62,-250 -94,-230 -110,-202 C-62,-218 0,-213 44,-207 C62,-205 76,-201 86,-198Z" fill="#2b2638"/>
       <path d="M86,-198 C80,-236 32,-256 -20,-252 L-18,-244 C26,-246 70,-230 78,-200Z" class="hw" fill="#8a5232" opacity="0"/>
       <path d="M-50,-226 C-92,-200 -110,-150 -116,-80 M-14,-214 C-46,-190 -60,-140 -62,-70" stroke="#2e2a3e" stroke-width="5" fill="none" stroke-linecap="round"/>
     </g>
@@ -201,11 +198,13 @@ const HUSH = `
       <path d="M100,96 C70,120 30,140 -20,150 M120,120 C90,150 50,170 0,182" stroke="#2c2a38" stroke-width="4" fill="none" stroke-linecap="round"/>
       <circle cx="128" cy="62" r="29" fill="#4a3329"/>
       <circle cx="128" cy="62" r="29" class="hw" fill="#93583a" opacity="0"/>
+      <g transform="rotate(55 128 62)">
       <path d="M104,46 C112,30 134,28 148,38 C134,36 120,42 112,56Z" fill="#140c08"/>
       <path d="M104,44 C110,26 136,22 152,34 C134,28 116,30 106,52Z" fill="#3e3b4c"/>
-      <path id="hBabyEyes" d="M120,58 q5,4 10,0 M138,54 q4,3 8,0" stroke="#140a06" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path id="hBabyBrow" d="M120,50 L129,48 M138,46 L146,45" stroke="#140a06" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0"/>
-      <ellipse id="hBabyMouth" cx="140" cy="72" rx="3.5" ry="1.2" fill="#24100c"/>
+      <path id="hBabyEyes" d="M115,60 q5,4 10,0 M133,56 q4,3 8,0" stroke="#140a06" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path id="hBabyBrow" d="M115,52 L124,50 M133,48 L141,47" stroke="#140a06" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0"/>
+      <ellipse id="hBabyMouth" cx="132" cy="75" rx="3.5" ry="1.2" fill="#24100c"/>
+      </g>
     </g>
     <g id="hHand">
       <path d="M-220,420 L-40,190 L20,112 L46,134 L-20,232 L-80,420Z" fill="#141220"/>
