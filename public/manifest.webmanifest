@@ -1,0 +1,11 @@
+{
+  "name": "Moses",
+  "short_name": "Moses",
+  "description": "An animated, interactive film about the life of Moses.",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#04050d",
+  "theme_color": "#04050d",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
