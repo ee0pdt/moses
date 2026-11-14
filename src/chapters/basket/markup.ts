@@ -131,11 +131,11 @@ const OPEN = `
 /* insert: the mother's face as the soldiers stop at the window (Exodus 2:2).
    Cool night tones; the warm copies (class hw) fade in with the torchlight from the right. */
 // her profile, facing right: forehead, brow, a long nose, full lips, chin, jaw
-const PROFILE = 'C56,-206 72,-192 77,-170 C79,-158 81,-149 80.5,-142 C79.5,-135 75,-132 73,-127 C73,-117 83,-105 91,-95 C96,-90 100.5,-87 100.5,-82 C100.5,-77 96.7,-75.5 93.2,-75.5 C91.2,-75.5 88.5,-73 87.5,-70 C90.6,-68 91.9,-64 89.1,-60 C86.8,-58 85.7,-57.5 85.9,-56 C87.8,-53 85.7,-47 81.3,-45 C78.9,-43 78,-40 77.8,-37 C78.4,-31 74.6,-25.5 66.5,-23.5';
-const FACE_D = `M30,-206 ${PROFILE} C48,-18 18,-26 -0.5,-46 C0,-58 -4,-74 -4,-90 C-5,-112 -6,-132 -4,-150 C-2,-180 10,-200 30,-206Z`;
-const LIT_D = `M30,-206 ${PROFILE} C60,-32 56,-48 61.9,-64 C70,-80 62,-96 63,-112 C60,-140 60,-176 30,-206Z`;
+const PROFILE = 'C56,-206 72,-192 77,-170 C79,-158 81,-149 80.5,-142 C79.5,-135 75,-132 73,-127 C72.2,-117 81.2,-105 88.4,-95 C92.9,-90 97.2,-87 96.8,-82 C96.4,-77 92.5,-75.5 89,-75.5 C87,-75.5 84,-73 82.8,-70 C85.7,-68 86.7,-64 83.6,-60 C81.1,-58 80,-57.5 80,-56 C81.7,-53 79.1,-47 74.5,-45 C72,-43 70.8,-40 70.4,-37 C70.5,-31 66.6,-25.5 58.5,-23.5';
+const FACE_D = `M30,-206 ${PROFILE} C40,-18 10,-26 -0.5,-46 C0,-58 -4,-74 -4,-90 C-5,-112 -6,-132 -4,-150 C-2,-180 10,-200 30,-206Z`;
+const LIT_D = `M30,-206 ${PROFILE} C52.2,-32 49.5,-48 56.7,-64 C66.1,-80 59.4,-96 61.8,-112 C60,-140 60,-176 30,-206Z`;
 const LID_D = 'M54,-136 C64,-141 77,-138 83,-127 L81,-121 C74,-116 64,-114 57,-119Z';
-const LIPS_D = 'M88,-70 C90.6,-68 91.9,-64 89.1,-60 C86.8,-58.5 84.8,-58.5 83.4,-59Z M85.9,-56 C87.8,-53 85.7,-47 81.3,-45 C80.6,-49 82.4,-53.5 85.9,-56Z';
+const LIPS_D = 'M83.3,-70 C85.7,-68 86.7,-64 83.6,-60 C81.2,-58.5 79.2,-58.5 77.8,-59Z M80,-56 C81.7,-53 79.1,-47 74.5,-45 C74.2,-49 76.3,-53.5 80,-56Z';
 const SWADDLE_D = 'M152,52 C176,86 156,130 104,160 C42,196 -40,212 -82,190 C-104,160 -62,118 0,100 C52,84 104,52 152,52Z';
 const HUSH = `
 <svg id="hush" class="full" preserveAspectRatio="none" style="display:none" aria-hidden="true">
@@ -151,8 +151,8 @@ const HUSH = `
     <path d="M-40,62 C10,30 72,24 104,40 C164,72 214,172 240,420 L-90,420Z" fill="#141220"/>
     <path d="M-40,62 C10,34 60,30 90,36 C60,44 20,52 -20,74Z" fill="#2a2536"/>
     <g id="hHead">
-      <path d="M-0.5,-46 C18,-26 50,-18 64,-21 C66,14 84,40 92,62 L-14,72 C-4,30 0,-10 -0.5,-46Z" fill="#33231d"/>
-      <path d="M64,-21 C66,14 70,40 78,62 L60,64 C54,40 50,10 50,-18Z" class="hw" fill="#7a4626" opacity="0"/>
+      <path d="M-7.2,-46 C10,-26 42,-18 56,-21 C58,14 84,40 92,62 L-14,72 C-4,30 0,-10 -0.5,-46Z" fill="#33231d"/>
+      <path d="M56,-21 C58,14 62,40 70,62 L52,64 C46,40 42,10 42,-18Z" class="hw" fill="#7a4626" opacity="0"/>
       <path d="${FACE_D}" fill="#4c362e"/>
       <path d="${LIT_D}" fill="#5e4438"/>
       <path d="${FACE_D}" class="hw" fill="#7c4a2c" opacity="0"/>
@@ -176,11 +176,11 @@ const HUSH = `
       <path d="M56,-131 C64,-137 76,-136 82,-128" stroke="#24150f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
       <path d="M48,-141 C58,-151 74,-152 86,-141 C76,-146 62,-146 50,-138Z" fill="#0f0806"/>
       </g>
-      <path d="M89,-79.5 C91.5,-77 93.5,-77 95,-78.5" stroke="#1e110c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M85.1,-79.5 C87.4,-77 89.4,-77 91,-78.5" stroke="#1e110c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
       <g id="hLips">
         <path d="${LIPS_D}" fill="#5a3029"/>
         <path d="${LIPS_D}" class="hw" fill="#94493a" opacity="0"/>
-        <path d="M82.8,-58 C84.6,-57 85.6,-57 86.7,-57.5" stroke="#1a0c0a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <path d="M77.1,-58 C78.8,-57 79.8,-57 81,-57.5" stroke="#1a0c0a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
       </g>
       <!-- dark hair parted under the veil, and loose strands across the temple -->
       <path d="M10,-216 C40,-222 66,-212 80,-197 C66,-200 50,-198 38,-192 C30,-178 24,-162 21,-142 C14,-160 6,-178 0,-186Z" fill="#0f0907"/>
