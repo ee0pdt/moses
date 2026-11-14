@@ -21,6 +21,9 @@
 ## Shell and chapters
 
 `main.ts` owns the start screen, the chapter menu and the replay/menu buttons.
+The start tap also requests full screen (`engine/fullscreen.ts`, skipped under
+`?auto`); a toggle button by the sound button appears only where the browser
+supports it and the app isn't already installed full screen.
 Switching chapters calls `tweens.clear()` and `chapter.unmount()`. `clear()`
 drops every tween, so a running story script just stops at its next `await`.
 It also runs cancel hooks (`tweens.onClear`) that `tap()`/`once()` prompts and
