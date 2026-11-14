@@ -16,13 +16,20 @@ export interface ChapterCtx {
  * terms). The shell mounts it once, renders it every frame, and plays it.
  */
 export interface Chapter {
-  id: string;
+  id: string;          // also the URL hash: #basket
   title: string;
+  ref: string;         // scripture reference
+  /** Menu tile art: inner SVG markup for a 160×120 viewBox. */
+  cover: string;
   mount(ctx: ChapterCtx): void;
+  /** Tear down everything mount() made (the shell clears tweens first). */
+  unmount(): void;
   /** Return to the first frame (black). */
   reset(): void;
   render(dt: number, T: number): void;
   /** Run the chapter's script; resolves when it has reached its last beat. */
   play(): Promise<void>;
   fadeOut(): Promise<void>;
+  /** Live scene for the console (__moses.X). */
+  inspect?(): unknown;
 }

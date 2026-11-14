@@ -18,6 +18,15 @@
 5. **No assets to load.** Art is inline SVG, sound is synthesised. The whole
    chapter is ~15 kB gzipped and starts instantly.
 
+## Shell and chapters
+
+`main.ts` owns the start screen, the chapter menu and the replay/menu buttons.
+Switching chapters calls `tweens.clear()` and `chapter.unmount()`. `clear()`
+drops every tween, so a running story script just stops at its next `await`.
+It also runs cancel hooks (`tweens.onClear`) that `tap()`/`once()` prompts and
+`every()` intervals register, so nothing is left listening or ticking. Use
+`every()` instead of `setInterval` in story scripts for that reason.
+
 ## Frame
 
 ```
@@ -64,9 +73,13 @@ re-rasterises changed regions every frame.
    (see `src/chapters/types.ts`): `mount`, `reset`, `render`, `play`, `fadeOut`.
 2. Put static art in `markup.ts`, generated art in `world.ts`, the per-frame
    renderer in `scene.ts`, the script in `story.ts`, sound cues in `sfx.ts`.
-3. Reuse `createMoses` and `createSheep`; add poses to `POSES` in
-   `characters/moses.ts`.
-4. Register it in `main.ts` (a chapter sequence/menu is the next shell task).
+3. Build people with `createFigure(defs, { head, prop, scale, rim })` using
+   `HEADS`/`PROPS` from `characters/moses.ts`; move them with `walkTo()`;
+   add poses to `POSES` in `characters/figure.ts`.
+4. Give it a `cover` (a 160×120 SVG tile) and add it to `src/chapters/index.ts`.
+   It then appears in the menu and at `#<id>`, and the smoke test plays it.
+5. Time-of-day palettes live in `styles/palette.css` (`data-t` on the stage);
+   `--pal` sets the cross-fade length (e.g. a quick cut when a lamp goes out).
 
 ## Conventions
 
@@ -74,4 +87,5 @@ re-rasterises changed regions every frame.
 - Ids inside chapter markup are global to the document; prefix if two chapters
   could ever be mounted at once.
 - Interaction: every prompt has a hint ring after a delay and a stray-tap
-  fallback, so no one is ever stuck. No text on screen.
+  fallback, so no one is ever stuck. No text in the film itself; the chapter
+  menu carries a title and scripture reference per tile.

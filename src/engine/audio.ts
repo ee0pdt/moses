@@ -8,7 +8,8 @@ import { smooth } from './math';
 export interface NzOpts { type?: BiquadFilterType; f?: number; f2?: number; q?: number; g?: number; a?: number; rv?: number; when?: number }
 export interface TnOpts { type?: OscillatorType; g?: number; a?: number; f2?: number; rv?: number; when?: number; trem?: number; lp?: number }
 export interface VoiceOpts { g?: number; a?: number; when?: number; vow?: number[] }
-export interface Beds { wind: number; roar: number; crackleRate: number; crackleGain: number }
+export interface Beds { wind: number; roar: number; crackleRate?: number; crackleGain?: number; lapRate?: number }
+export const SILENCE: Beds = { wind: 0, roar: 0 };
 
 interface Bed { f: BiquadFilterNode; g: GainNode }
 
@@ -116,7 +117,10 @@ export class AudioEngine {
     this.wind.g.gain.value += (w - this.wind.g.gain.value) * smooth(.04, dt);
     this.wind.f.frequency.value = 400 + 150 * Math.sin(T * .23) + 70 * Math.sin(T * .71);
     this.roar.g.gain.value += (b.roar - this.roar.g.gain.value) * smooth(.08, dt);
-    if (Math.random() < dt * b.crackleRate)
-      this.nz(.03 + Math.random() * .04, { type: 'highpass', f: 1800 + Math.random() * 3000, g: (.04 + Math.random() * .16) * b.crackleGain });
+    if (b.crackleRate && Math.random() < dt * b.crackleRate)
+      this.nz(.03 + Math.random() * .04, { type: 'highpass', f: 1800 + Math.random() * 3000, g: (.04 + Math.random() * .16) * (b.crackleGain ?? 1) });
+    // water lapping against reeds and banks
+    if (b.lapRate && Math.random() < dt * b.lapRate)
+      this.nz(.25 + Math.random() * .35, { type: 'lowpass', f: 280 + Math.random() * 380, g: .025 + Math.random() * .04, a: .08, rv: .2 });
   }
 }

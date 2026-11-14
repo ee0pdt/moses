@@ -1,6 +1,6 @@
 import { at, show } from '../../engine/dom';
 import { io, lin, out, inn } from '../../engine/math';
-import { tween, wait, cut } from '../../engine/tween';
+import { tween, wait, cut, every } from '../../engine/tween';
 import { POSES } from '../../characters/moses';
 import type { Scene } from './scene';
 import { RB, BX } from './world';
@@ -13,7 +13,7 @@ export async function story(X: Scene) {
   const { S, W, I, moses, sfx, audio: a, ctx } = X;
   const { tap, once } = ctx.input;
   const m = S.m, n = S.sn, P = moses.P, cam = () => X.cam;
-  const staff = (on: boolean) => { moses.staffOn = on; };
+  const staff = (on: boolean) => { moses.propOn = on; };
   const serpent = (x: number) => {
     staff(false);
     Object.assign(n, { on: true, x, a: -92, amp: 0, alive: 0 });
@@ -102,7 +102,7 @@ export async function story(X: Scene) {
   tween(m, { lean: 0 }, 300);
 
   // 7 · the staff ("Cast it on the ground")
-  await tap([moses.hit], moses.staffRing, { delay: 3500 });
+  await tap([moses.hit], moses.ring, { delay: 3500 });
   serpent(5629); moses.toPose('free', 350);
   await tween(n, { a: 0 }, 420, inn);
   a.tn(620, .12, { type: 'triangle', g: .25, rv: .3 }); a.tn(410, .14, { type: 'triangle', g: .2, when: .11, rv: .3 });
@@ -111,8 +111,8 @@ export async function story(X: Scene) {
   // only now does he start — a jump, then a few quick steps backwards, still facing it
   moses.toPose('fear', 160, out); await tween(m, { hop: 13 }, 150, out); await tween(m, { hop: 0 }, 190, inn);
   m.walk = true; await tween(m, { x: 5530 }, 720, out); m.walk = false;
-  const hiss = setInterval(() => a.nz(.9, { type: 'highpass', f: 5200, g: .09, a: .2 }), 2600);
-  await tap([W.snakeHit], W.snakeRing, { delay: 3800 }); clearInterval(hiss);
+  const stopHiss = every(2600, () => a.nz(.9, { type: 'highpass', f: 5200, g: .09, a: .2 }));
+  await tap([W.snakeHit], W.snakeRing, { delay: 3800 }); stopHiss();
   // gingerly: a step, a pause, another; he kneels; a first reach that flinches; then the tail
   const creep = async (x: number) => { m.walk = true; await tween(m, { x }, Math.abs(x - m.x) / 20 * 1000, lin); m.walk = false; };
   moses.toPose('wary', 600); await creep(5552); await wait(550); await creep(5570); await wait(450); await creep(5581); await wait(350);
@@ -146,7 +146,7 @@ export async function story(X: Scene) {
   await wait(900); ctx.stage.dataset.t = 'dawn';
   tween(S, { fire: .85, fireAud: .5, wind: .2 }, 5000); tween(m, { rim: .25 }, 5000);
   tween(cam(), { x: 5500, y: 440, w: 1150, pw: 700 }, 6000); await wait(3200);
-  await tap([moses.hit, W.pathHit], moses.staffRing, { delay: 4000, stray: 3 });
+  await tap([moses.hit, W.pathHit], moses.ring, { delay: 4000, stray: 3 });
   a.voice([146.8, 220, 293.7, 370], 9, { g: .09, a: 2.5, vow: [700, 1150] });
   tween(cam(), { x: 5480, y: 430, w: 1300, pw: 820 }, 12000);
   S.follow = true;

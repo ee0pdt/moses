@@ -73,7 +73,7 @@ export function createScene(ctx: ChapterCtx) {
       X.S = freshState();
       X.cam = { x: RA, y: 430, w: 1300, pw: 640, shake: 0 };
       stage.dataset.t = 'dusk';
-      X.setSet('A'); moses.toPose('stand'); moses.staffOn = true;
+      X.setSet('A'); moses.toPose('stand'); moses.propOn = true;
       W.flock.forEach(s => Object.assign(s, { x: 572 - s.gap, lx: 572 - s.gap, f: 1, moving: false, gz: false, hd: 0 }));
       [I.feet, I.vision, I.hand, I.face].forEach(e => show(e, false));
       X.skin(0);
