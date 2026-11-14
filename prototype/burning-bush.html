@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Moses — The Burning Bush</title>
+<style>
+:root{color-scheme:dark}
+html,body{margin:0;height:100%;background:#04050d;overflow:hidden;overscroll-behavior:none}
+#stage{position:fixed;inset:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.full{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sky{opacity:0;transition:opacity 5s ease-in-out}
+#skyDusk{background:linear-gradient(#2a2748 0%,#6a557c 44%,#e8b98a 72%,#e8b98a 100%)}
+#skyNight{background:linear-gradient(#060a1e 0%,#14224a 58%,#264264 76%,#264264 100%)}
+#skyDawn{background:linear-gradient(#3c4c72 0%,#b79aa0 46%,#f6dcae 72%,#f6dcae 100%)}
+#stage[data-t=dusk] #skyDusk,#stage[data-t=night] #skyNight,#stage[data-t=dawn] #skyDawn{opacity:1}
+#stars{opacity:0;transition:opacity 6s}
+#stage[data-t=night] #stars{opacity:1}
+#stars i{position:absolute;border-radius:50%;background:#dfe6ff}
+#stars i.tw{animation:tw 3.2s ease-in-out infinite}
+@keyframes tw{50%{opacity:.15}}
+
+#stage[data-t=dusk]{--far:#c9977a;--mount:#9c6a62;--mid:#7a4c4c;--ground:#553438;--fore1:#3b2430;--fore2:#261724;--fig:#1c1118;--wool:#c9b292}
+#stage[data-t=night]{--far:#26335a;--mount:#1c2748;--mid:#161d3a;--ground:#11162c;--fore1:#0a0e20;--fore2:#060816;--fig:#04050d;--wool:#6c7594}
+#stage[data-t=dawn]{--far:#d3ab92;--mount:#a98274;--mid:#84605a;--ground:#5e4244;--fore1:#3d2a30;--fore2:#291b22;--fig:#1e1318;--wool:#d8c5a4}
+.c-far{fill:var(--far)}.c-mount{fill:var(--mount)}.c-mid{fill:var(--mid)}.c-ground{fill:var(--ground)}
+.c-fore1{fill:var(--fore1)}.c-fore2{fill:var(--fore2)}.c-fig{fill:var(--fig)}.c-wool{fill:var(--wool)}
+.s-fig{stroke:var(--fig);fill:none}
+.c-far,.c-mount,.c-mid,.c-ground,.c-fore1,.c-fore2,.c-fig,.c-wool,.ink,.s-fig{transition:fill 5s ease-in-out,stroke 5s ease-in-out}
+.ink{fill:var(--fig);stroke:var(--fig)}
+.rim{fill:#f09a3e;stroke:#f09a3e}
+.hit{fill:transparent;stroke:none;pointer-events:none}
+.hit.live{pointer-events:all;cursor:pointer}
+.ring{fill:none;stroke:#fff3c4;stroke-width:2.5;vector-effect:non-scaling-stroke;opacity:0;transform-box:fill-box;transform-origin:center;pointer-events:none}
+.ring.on{animation:ring 2.2s ease-out infinite}
+@keyframes ring{0%{opacity:0;transform:scale(.45)}25%{opacity:.8}100%{opacity:0;transform:scale(1.5)}}
+#snake{transition:stroke .7s}
+.rip{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid rgba(255,243,196,.55);pointer-events:none;animation:rip .55s ease-out forwards}
+@keyframes rip{from{transform:scale(.2);opacity:1}to{transform:scale(1.25);opacity:0}}
+#black{background:#04050d;pointer-events:none}
+#flash{background:#fff3c4;opacity:0;pointer-events:none}
+button{position:absolute;width:48px;height:48px;padding:10px;border:0;border-radius:50%;background:rgba(10,12,28,.28);color:#fff3c4;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#mute{top:12px;right:12px;opacity:.55}
+#mute.off .on,#mute:not(.off) .x{display:none}
+#again{left:50%;bottom:9%;margin-left:-30px;width:60px;height:60px;padding:14px;opacity:0;transition:opacity 2s;pointer-events:none}
+#again.show{opacity:.85;pointer-events:auto}
+#start{display:flex;align-items:center;justify-content:center;background:#04050d;cursor:pointer;transition:opacity 1.6s}
+#start svg{width:120px;height:120px;animation:ember 2.4s ease-in-out infinite;overflow:visible}
+@keyframes ember{50%{transform:scale(1.14);filter:brightness(1.25)}}
+</style>
+</head>
+<body>
+<div id="stage" data-t="dusk">
+  <div id="skyDusk" class="sky full"></div>
+  <div id="skyNight" class="sky full"></div>
+  <div id="skyDawn" class="sky full"></div>
+  <div id="stars" class="full"></div>
+
+  <svg id="world" class="full" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <radialGradient id="gGlow"><stop offset="0" stop-color="#fff3c4" stop-opacity=".95"/><stop offset=".22" stop-color="#f8b83a" stop-opacity=".55"/><stop offset=".6" stop-color="#ef7a1a" stop-opacity=".16"/><stop offset="1" stop-color="#ef7a1a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="gHolyW"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".4" stop-color="#fff3c4" stop-opacity=".55"/><stop offset="1" stop-color="#f8d27a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="gCloudR"><stop offset="0" stop-color="#d23a1e" stop-opacity=".8"/><stop offset=".55" stop-color="#c8321e" stop-opacity=".4"/><stop offset="1" stop-color="#c8321e" stop-opacity="0"/></radialGradient>
+      <radialGradient id="gCloudO"><stop offset="0" stop-color="#f58a1f" stop-opacity=".9"/><stop offset=".55" stop-color="#ef7a1a" stop-opacity=".45"/><stop offset="1" stop-color="#ef7a1a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="gCloudY"><stop offset="0" stop-color="#ffe08a" stop-opacity=".95"/><stop offset=".55" stop-color="#f8c95a" stop-opacity=".5"/><stop offset="1" stop-color="#f8c95a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="gCloudW"><stop offset="0" stop-color="#fffdf2"/><stop offset=".4" stop-color="#fff3c4" stop-opacity=".8"/><stop offset="1" stop-color="#fff3c4" stop-opacity="0"/></radialGradient>
+      <linearGradient id="gPath" x1="1" x2="0"><stop offset="0" stop-color="#fff3c4"/><stop offset=".5" stop-color="#f8d27a"/><stop offset="1" stop-color="#f8d27a" stop-opacity=".25"/></linearGradient>
+      <path id="flame" d="M0,8 L-9,4 L-11,-7 L-5,-21 L-2,-13 L1,-30 L8,-15 L11,-3 L8,5Z"/>
+      <g id="mosesDef">
+        <path id="rLegs" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+        <ellipse id="rFootB" rx="8" ry="3.5"/><ellipse id="rFootF" rx="8" ry="3.5"/>
+        <path id="rArmB" fill="none" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path id="rRobe"/>
+        <g id="rHead"><circle r="10.5"/><path d="M-11,-3 C-10,-15 7,-16 10,-5 C4,-8 -3,-7 -7,0 C-9,4 -12,6 -14,9 C-15,3 -14,-1 -11,-3Z"/><path id="rTail" d="M-11,-3 C-9,-3 -6,-1 -7,0 C-11,8 -17,13 -21,23 C-22,11 -16,2 -11,-3Z"/><path d="M4,6 C11,6 13,13 8,22 C4,18 2,12 4,6Z"/></g>
+        <g id="rStaff"><path d="M2.5,64 L-1.5,-44 C-1.5,-56 10.5,-55 9.5,-45" stroke-width="3.6" fill="none" stroke-linecap="round"/></g>
+        <path id="rArmF" fill="none" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </defs>
+    <g id="setA"></g>
+    <g id="setB" display="none"></g>
+  </svg>
+
+  <!-- insert: the sandals -->
+  <svg id="feet" class="full" preserveAspectRatio="none" style="display:none" aria-hidden="true">
+    <defs><radialGradient id="gHoly"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".35" stop-color="#fff3c4" stop-opacity=".6"/><stop offset="1" stop-color="#f8d27a" stop-opacity="0"/></radialGradient></defs>
+    <rect x="-3000" y="-3000" width="6000" height="6000" fill="#120a12"/>
+    <polygon id="fGlow" points="330,-3000 3000,-3000 3000,3000 560,3000 440,200 500,-400" fill="#8a4a26"/>
+    <path d="M-3000,3000 L-3000,18 L-420,8 L-300,-22 L-180,14 L40,22 L260,-6 L420,16 L3000,6 L3000,3000Z" fill="#1b1326"/>
+    <rect x="-3000" y="60" width="6000" height="3000" fill="#150d14"/>
+    <rect x="-3000" y="60" width="6000" height="4" fill="#e8a25a" opacity=".3"/>
+    <g id="holy" opacity="0"><polygon points="-520,66 -220,34 200,30 520,60 260,104 -240,108" fill="#fff3c4" opacity=".45"/><polygon points="-300,66 -120,48 140,46 300,64 150,86 -130,88" fill="#ffffff" opacity=".6"/></g>
+    <rect id="holyLine" x="-3000" y="59" width="6000" height="3" fill="#fff3c4" opacity="0"/>
+    <g id="footFar" transform="translate(-75,54) scale(.88)">
+      <g class="leg"><path d="M-27,-240 L-31,-22 L-27,-4 L-11,0 L61,0 L74,-4 L73,-13 L47,-21 L26,-30 L17,-42 L15,-240Z" fill="#e8a25a"/><path d="M-30,-240 L-34,-22 L-30,-4 L-14,0 L58,0 L71,-4 L70,-13 L44,-21 L23,-30 L14,-42 L12,-240Z" fill="#6e4530"/></g>
+      <g class="sandal"><path d="M-40,0 L74,0 C80,0 80,9 74,9 L-40,9 C-46,9 -46,0 -40,0Z" fill="#33200f"/><path d="M26,1 L33,-25 M51,1 L45,-19 M-34,-31 L14,-35 M-31,1 L-33,-30 M13,-35 L30,-2" stroke="#b08d5c" stroke-width="6" stroke-linecap="round" fill="none"/></g>
+      <circle class="ring" cx="16" cy="-12" r="52"/><rect class="hit" x="-70" y="-90" width="170" height="130"/>
+    </g>
+    <g id="footNear" transform="translate(40,62)">
+      <g class="leg"><path d="M-27,-240 L-31,-22 L-27,-4 L-11,0 L61,0 L74,-4 L73,-13 L47,-21 L26,-30 L17,-42 L15,-240Z" fill="#f0aa5e"/><path d="M-30,-240 L-34,-22 L-30,-4 L-14,0 L58,0 L71,-4 L70,-13 L44,-21 L23,-30 L14,-42 L12,-240Z" fill="#9a6240"/></g>
+      <g class="sandal"><path d="M-40,0 L74,0 C80,0 80,9 74,9 L-40,9 C-46,9 -46,0 -40,0Z" fill="#3b2416"/><path d="M26,1 L33,-25 M51,1 L45,-19 M-34,-31 L14,-35 M-31,1 L-33,-30 M13,-35 L30,-2" stroke="#c7a06a" stroke-width="6" stroke-linecap="round" fill="none"/></g>
+      <circle class="ring" cx="16" cy="-12" r="56"/><rect class="hit" x="-60" y="-90" width="170" height="140"/>
+    </g>
+    <path d="M-197,-900 L-227,-200 L-212,-82 L-117,-98 L-57,-74 L53,-96 L113,-70 L203,-90 L238,-76 L228,-500 L218,-900Z" fill="#c06a36" opacity=".55" transform="translate(4,2)"/>
+    <path d="M-200,-900 L-230,-200 L-215,-84 L-120,-100 L-60,-76 L50,-98 L110,-72 L200,-92 L235,-78 L225,-500 L215,-900Z" fill="#0d0912"/>
+  </svg>
+
+  <!-- insert: the vision in the fire -->
+  <svg id="vision" class="full" preserveAspectRatio="none" style="display:none" aria-hidden="true">
+    <defs><radialGradient id="gVision" gradientUnits="userSpaceOnUse" cx="0" cy="-10" r="540"><stop offset="0" stop-color="#fff0b8"/><stop offset=".18" stop-color="#f8c04a"/><stop offset=".42" stop-color="#ef7a1a"/><stop offset=".7" stop-color="#c8321e"/><stop offset="1" stop-color="#4a0d10"/></radialGradient></defs>
+    <rect x="-3000" y="-3000" width="6000" height="6000" fill="#4a0d10"/><polygon points="-520,-60 -380,-400 -60,-540 300,-470 520,-200 560,160 380,470 20,560 -330,480 -540,220" fill="#a3261a"/><polygon points="-380,-40 -280,-290 -30,-390 220,-340 380,-140 400,110 270,330 10,400 -240,340 -390,150" fill="#c8321e"/><polygon points="-240,-30 -170,-190 -20,-250 140,-210 240,-90 250,70 170,200 0,240 -150,200 -240,90" fill="#ef7a1a"/><polygon points="-110,-20 -80,-100 -10,-130 70,-110 110,-50 120,30 80,90 0,110 -70,90 -110,40" fill="#f8c04a"/>
+    <polygon points="-340,110 -195,-95 -50,110" fill="#b5361f" opacity=".55"/>
+    <polygon points="-170,110 -62,-34 46,110" fill="#9c2a18" opacity=".7"/>
+    <g id="vFlames"></g>
+    <rect x="-3000" y="110" width="6000" height="3000" fill="#3a0c10"/>
+    <g fill="#24060a" stroke="#24060a" stroke-linecap="round">
+      <g id="vBlock"><rect x="-196" y="58" width="58" height="46" stroke="none"/><circle cx="-184" cy="106" r="5" stroke="none"/><circle cx="-150" cy="106" r="5" stroke="none"/><path id="vRope" d="M-138,80 L-74,64 L-24,64 L26,64" stroke-width="2.2" fill="none"/></g>
+      <g id="vHaul"></g>
+      <g transform="translate(118,110)">
+        <path d="M0,-28 L0,-64" stroke-width="14"/><path d="M0,-28 L-7,0 M0,-28 L8,0" stroke-width="7"/>
+        <circle cx="-1" cy="-76" r="8" stroke="none"/><path d="M-7,-85 L9,-86 L15,-58 L5,-66Z" stroke="none"/>
+        <g id="vWhip"><path d="M0,-60 L-10,-86" stroke-width="6"/><path d="M-10,-86 C-12,-126 -66,-124 -88,-74" stroke-width="2.4" fill="none"/></g>
+      </g>
+    </g>
+  </svg>
+
+  <!-- insert: the hand (flat polygons) -->
+  <svg id="hand" class="full" preserveAspectRatio="none" style="display:none" aria-hidden="true">
+    <rect x="-3000" y="-3000" width="6000" height="6000" fill="#1a1220"/>
+    <polygon points="120,-3000 3000,-3000 3000,3000 420,3000 300,300 380,-200" fill="#231626"/>
+    <polygon id="hLight" points="520,-3000 3000,-3000 3000,3000 760,3000 640,200 700,-400" fill="#8a4a26"/>
+    <g id="hArm">
+      <polygon points="150,-62 900,-150 900,170 150,64" fill="#0d0912"/>
+      <polygon points="150,-62 900,-150 900,-96 168,-34" fill="#5a3320"/>
+      <polygon points="60,-28 170,-40 170,40 60,30" style="fill:var(--hb)"/>
+      <polygon points="60,-28 170,-40 170,-14 60,-8" style="fill:var(--hl)"/>
+      <g id="hPalm">
+        <polygon points="60,-30 -10,-36 -30,-10 -28,22 0,34 60,30" style="fill:var(--hb)"/>
+        <polygon points="60,-30 -10,-36 -16,-18 60,-8" style="fill:var(--hl)"/>
+        <polygon points="60,30 0,34 -28,22 -20,14 60,16" style="fill:var(--hs)"/>
+        <polygon points="26,-32 0,-66 -20,-60 -10,-36" style="fill:var(--hl)"/>
+        <g id="hFing">
+          <polygon points="-10,-36 -82,-36 -86,-23 -30,-18" style="fill:var(--hl)"/>
+          <polygon points="-30,-18 -94,-17 -97,-3 -30,-2" style="fill:var(--hb)"/>
+          <polygon points="-30,-2 -88,1 -90,14 -29,12" style="fill:var(--hb)"/>
+          <polygon points="-29,12 -72,19 -72,31 -22,26" style="fill:var(--hs)"/>
+        </g>
+      </g>
+    </g>
+    <polygon points="-3000,-3000 70,-3000 10,-520 -20,-200 -64,0 -34,230 -70,560 -110,3000 -3000,3000" fill="#0d0912"/>
+    <polygon points="70,-3000 10,-520 -20,-200 -64,0 -34,230 -70,560 -110,3000 -140,3000 -96,560 -62,230 -92,0 -50,-200 -22,-520 36,-3000" fill="#5a3320"/>
+    <circle class="ring" id="hRing" cx="40" cy="20" r="80"/>
+    <rect class="hit" id="hHit" x="-3000" y="-3000" width="6000" height="6000"/>
+  </svg>
+  <svg id="face" class="full" preserveAspectRatio="none" style="display:none" aria-hidden="true">
+    <rect x="-3000" y="-3000" width="6000" height="6000" fill="#0b1030"/>
+    <polygon id="fcLight" points="260,-3000 3000,-3000 3000,3000 420,3000 330,300 400,-300" fill="#8a4a26"/>
+    <polygon points="-3000,-3000 90,-3000 62,-300 40,-150 20,-150 10,-40 20,60 70,70 60,150 24,270 -40,460 -60,3000 -3000,3000" fill="#0d0912"/>
+    <polygon points="20,-150 40,-150 70,-70 80,-50 120,0 86,14 92,34 80,50 70,70 20,60 10,-40" fill="#b8683a"/>
+    <polygon points="30,-150 40,-150 70,-70 80,-50 120,0 100,-4 66,-48 52,-80" fill="#e8a25a"/>
+    <polygon points="90,-3000 62,-300 40,-150 26,-150 46,-300 70,-3000" fill="#5a3320"/>
+    <polygon points="70,70 78,74 68,152 60,150" fill="#5a3320"/>
+    <g id="fcEye"><polygon points="30,-64 52,-70 64,-58 50,-50 32,-52" fill="#f3e6c8"/><polygon points="48,-66 58,-62 56,-53 46,-54" fill="#0d0912"/></g>
+    <polygon points="24,-74 60,-84 70,-70 28,-66" fill="#0d0912"/>
+  </svg>
+
+  <div id="flash" class="full"></div>
+  <div id="black" class="full"></div>
+
+  <button id="mute" aria-label="Sound"><svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="on" d="M15.5 9.5a4 4 0 0 1 0 5M18 7a7.5 7.5 0 0 1 0 10"/><path class="x" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
+  <button id="again" aria-label="Again"><svg viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"/><path d="M4 4.5v4h4"/></svg></button>
+
+  <div id="start" class="full" role="button" aria-label="Begin">
+    <svg viewBox="-30 -50 60 70"><use href="#flame" fill="#c8321e" transform="scale(1.7)"/><use href="#flame" fill="#ef7a1a" transform="translate(0,3) scale(-1.2,1.2)"/><use href="#flame" fill="#fff3c4" transform="translate(0,6) scale(.65)"/></svg>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s), NS='http://www.w3.org/2000/svg';
+const el=(tag,a={},parent)=>{const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(parent)parent.appendChild(e);return e};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const io=u=>u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2, lin=u=>u, out=u=>1-Math.pow(1-u,3), inn=u=>u*u*u;
+const rng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const stage=$('#stage'), world=$('#world'), feet=$('#feet'), vision=$('#vision');
+const RA=600, RB=5600, BX=5800, BY=600;
+
+/* ---------- build the paper world ---------- */
+const LAYERS=[];
+const layer=(set,d,ref)=>{const g=el('g',{},$('#set'+set));LAYERS.push({g,d,ref});return g};
+const card=(g,d,cls)=>el('path',{d,class:cls},g);
+function ridge(x0,x1,base,amp,wl,seed,step=150){const r=rng(seed),p=[r()*6,r()*6,r()*6];let d=`M${x0},3000`;
+  for(let x=x0;x<=x1;x+=step){const y=base-amp*(Math.sin(x/wl+p[0])*.6+Math.sin(x/(wl*.37)+p[1])*.3+Math.sin(x/(wl*.13)+p[2])*.1);d+=`L${x},${y.toFixed(1)}`}
+  return d+`L${x1},3000Z`}
+const poly=(ref,pts)=>'M'+pts.map(p=>(ref+p[0])+','+p[1]).join('L')+'Z';
+function tufts(g,x0,x1,y,n,seed,cls){const r=rng(seed);for(let i=0;i<n;i++){const x=x0+r()*(x1-x0),h=10+r()*14,yy=y+r()*6;
+  el('path',{d:`M${x-7},${yy} L${x-9},${yy-h*.7} L${x-3},${yy-2} L${x},${yy-h} L${x+3},${yy-2} L${x+10},${yy-h*.6} L${x+7},${yy}Z`,class:cls},g)}}
+function sheepEl(g,kind){const s=el('g',{},g),goat=kind==='goat',hy=goat?-14:-12,px=goat?13:15,py=-23;
+  const legs=[-15,-9,9,14].map(x=>el('line',{x1:x,y1:hy,x2:x,y2:0,class:'s-fig','stroke-width':2.4,'stroke-linecap':'round'},s));
+  const head=el('g',{},s);
+  if(goat){
+    el('path',{d:'M-20,-19 C-21,-27 -14,-30 -6,-29 L10,-29 C17,-29 20,-25 19,-19 C18,-14 13,-13 6,-13 L-12,-13 C-17,-13 -19,-15 -20,-19Z M-19,-27 L-26,-34 L-20,-23Z',class:'c-fig'},s);
+    el('path',{d:'M11,-28 C15,-35 18,-41 23,-44 L33,-39 C34,-36 31,-34 27,-34 C24,-29 21,-23 15,-19Z',class:'c-fig'},head);
+    el('path',{d:'M29,-35 L28,-27 L25,-34Z',class:'c-fig'},head);
+    el('path',{d:'M23,-44 C21,-52 15,-55 11,-51',class:'s-fig','stroke-width':2.2,'stroke-linecap':'round'},head);
+  }else{
+    el('path',{d:'M-22,-17 C-24,-27 -16,-32 -6,-31 L10,-31 C18,-31 22,-26 21,-19 C20,-13 14,-11 6,-11 L-12,-11 C-18,-11 -21,-13 -22,-17Z M-21,-26 C-29,-25 -30,-12 -25,-7 C-21,-10 -20,-17 -21,-26Z',class:'c-fig'},s);
+    el('path',{d:'M13,-28 C17,-34 21,-39 26,-40 C31,-41 36,-36 35,-32 C34,-29 30,-28 27,-29 C24,-25 21,-21 16,-18Z',class:'c-fig'},head);
+    el('path',{d:'M24,-39 C20,-37 18,-30 20,-25 C24,-28 26,-34 24,-39Z',class:'c-fig'},head);
+  }
+  s.appendChild(head);
+  el('rect',{x:-36,y:-60,width:76,height:68,class:'hit live'},s);
+  return{g:s,legs,head,hy,px,py}}
+
+function blob(g,cx,cy,rx,ry,fill,steps,seed){const r=rng(seed),grp=el('g',{},g);
+  for(const [sc,op] of steps){const pts=[],n=11;for(let i=0;i<n;i++){const a=i/n*6.283+r()*.25,rr=sc*(.86+r()*.28);pts.push((cx+Math.cos(a)*rx*rr).toFixed(1)+','+(cy+Math.sin(a)*ry*rr).toFixed(1))}
+    el('polygon',{points:pts.join(' '),fill,opacity:op},grp)}return grp}
+// Set A — the plain at dusk
+const aMount=layer('A',.25,RA);
+card(aMount,poly(RA,[[-1700,620],[-700,590],[-200,450],[60,330],[230,150],[400,300],[800,500],[1700,570],[1700,3000],[-1700,3000]]),'c-mount');
+el('path',{d:poly(RA,[[-700,590],[-200,450],[60,330],[230,150],[200,330],[60,470],[-300,620]]),fill:'#fff',opacity:.06},aMount);
+el('path',{d:poly(RA,[[230,150],[400,300],[800,500],[700,620],[300,620],[260,380]]),fill:'#000',opacity:.07},aMount);
+const farHalo=blob(aMount,RA+150,300,74,74,'#f8b83a',[[1,.13],[.5,.22]],7);
+const farCore=el('use',{href:'#flame',fill:'#fff3c4'},aMount);
+const farRing=el('circle',{cx:RA+150,cy:300,r:46,class:'ring'},aMount);
+const farHit=el('circle',{cx:RA+150,cy:300,r:105,class:'hit'},aMount);
+const aMain=layer('A',1,RA);
+card(aMain,ridge(RA-1700,RA+2400,601,4,260,5),'c-ground');
+const flock=[[188,602,1,'sheep'],[124,603,.95,'goat'],[66,602,.6,'sheep']].map(([gap,y,s,k])=>{const p=sheepEl(aMain,k);return{el:p.g,p,gap,x:0,y,s,f:1,ph:Math.random()*6,hd:0,gz:false,gt:1+Math.random()*2,lx:0}});
+card(layer('A',1.25,RA),ridge(RA-2400,RA+3000,700,14,340,41),'c-fore2');
+
+// Set B — the mountain of God at night
+const bCrag=layer('B',.4,RB);
+card(bCrag,poly(RB,[[-1700,600],[-520,560],[60,330],[330,110],[900,-520],[1700,-1300],[1700,3000],[-1700,3000]]),'c-mount');
+el('path',{d:poly(RB,[[60,330],[330,110],[900,-520],[900,-380],[380,200],[160,420],[-520,600],[-520,560]]),fill:'#fff',opacity:.05},bCrag);
+const facet=el('path',{d:poly(RB,[[150,600],[260,380],[520,200],[700,600]]),fill:'#d0763a',opacity:0},bCrag);
+const bMain=layer('B',1,RB);
+card(bMain,ridge(RB-1900,RB+1900,601,4,170,13),'c-ground');
+const gLight=blob(bMain,BX,606,320,20,'#f8b83a',[[1,.13],[.5,.2]],6);
+const pathGlow=el('line',{x1:BX-36,y1:604,x2:BX-1500,y2:604,stroke:'#f8d27a','stroke-width':18,'stroke-linecap':'round',opacity:.2,'stroke-dasharray':1470,'stroke-dashoffset':1470},bMain);
+const pathLine=el('line',{x1:BX-36,y1:604,x2:BX-1500,y2:604.01,stroke:'url(#gPath)','stroke-width':5,'stroke-linecap':'round','stroke-dasharray':1470,'stroke-dashoffset':1470},bMain);
+const pathHit=el('rect',{x:BX-1500,y:560,width:1440,height:90,class:'hit'},bMain);
+const holyW=blob(bMain,BX-10,606,250,13,'#fff3c4',[[1,.4],[.6,.55]],8);holyW.setAttribute('opacity',0);
+const sandalsW=el('path',{d:'M5464,601 h15 a1.6,1.6 0 0 1 0,3.2 h-15 a1.6,1.6 0 0 1 0,-3.2Z M5483,600 l14,-2.5 a1.6,1.6 0 0 1 .6,3.1 l-14,2.5 a1.6,1.6 0 0 1 -.6,-3.1Z',class:'c-fig',display:'none'},bMain);
+const halo=el('circle',{cx:BX,cy:BY-60,r:300,fill:'url(#gGlow)'},bMain);
+const fireBack=el('g',{},bMain);
+const bush=el('g',{transform:`translate(${BX},${BY})`},bMain);
+{const C='#150c0e';
+ [['M0,2 L-1,-20 L0,-30',6],['M0,-16 L-26,-36 L-36,-52',4.5],['M0,-18 L26,-38 L38,-50',4.5],['M0,-30 L-8,-58 L-12,-74',4],['M0,-30 L12,-58 L18,-72',4],['M-20,-32 L-42,-35 L-52,-32',3.5],['M22,-34 L44,-37 L54,-33',3.5]]
+  .forEach(([d,w])=>el('path',{d,stroke:C,'stroke-width':w,'stroke-linecap':'round','stroke-linejoin':'round',fill:'none'},bush));
+ [[-41,-59,-58],[43,-57,-45],[-13,-83,-80],[20,-81,-72],[-61,-31,12],[63,-32,-10],[-27,-45,-25],[30,-47,25],[-7,-57,-62],[11,-55,-118],[-45,-41,32],[47,-43,-32]]
+  .forEach(([x,y,a])=>el('ellipse',{cx:x,cy:y,rx:9.5,ry:4.4,transform:`rotate(${a} ${x} ${y})`,fill:C},bush))}
+const fireFront=el('g',{},bMain);
+const sparkG=el('g',{},bMain);
+const fireRing=el('circle',{cx:BX,cy:BY-60,r:70,class:'ring'},bMain);
+const fireHit=el('circle',{cx:BX,cy:BY-65,r:125,class:'hit'},bMain);
+const snakeG=el('g',{display:'none'},bMain);
+const snake=el('path',{id:'snake',fill:'none','stroke-width':5.5,'stroke-linecap':'round','stroke-linejoin':'round'},snakeG);
+const tongue=el('path',{fill:'none',stroke:'#e03a22','stroke-width':1.8,'stroke-linecap':'round'},snakeG);
+const snakeRing=el('circle',{r:44,class:'ring'},snakeG);
+const snakeHit=el('rect',{class:'hit',width:210,height:110},snakeG);
+const bFore=layer('B',1.2,RB);
+card(bFore,ridge(RB-2400,RB+2400,712,10,380,17),'c-fore2');
+
+// Moses (one figure, moved between sets)
+const moses=el('g',{id:'moses'});
+const rimU=el('use',{href:'#mosesDef',class:'rim'},moses), inkU=el('use',{href:'#mosesDef',class:'ink'},moses);
+const staffRing=el('circle',{cx:28,cy:-70,r:42,class:'ring'},moses);
+const mosesHit=el('rect',{x:-42,y:-130,width:100,height:140,class:'hit'},moses);
+// the rig: hip, torso, head, two-bone arms and legs (IK), a robe skinned over the joints
+const ST={hx:-1,hy:-46,t:0,h:0,fFx:9,fFy:0,fBx:-7,fBy:0,aFx:26.5,aFy:-64,aBx:-3,aBy:-60,ab:0,sa:0,sg:64};
+const KN={...ST,hx:-9,hy:-23,t:6,fFx:-8,fFy:-3,fBx:-14,fBy:-3,aFx:13,aFy:-34};
+const POSES={stand:ST,free:{...ST,aFx:7,aFy:-52},wary:{...ST,t:-4,aFx:17,aFy:-62},fear:{...ST,hx:-4,t:-9,h:-4,aFx:22,aFy:-80},
+  kneel:KN,flinch:{...KN,t:-8,h:-6,aFx:11,aFy:-54},reach:{...KN,hx:-10,t:62,h:-30,aFx:48,aFy:-6},
+  awe:{...ST,hx:-4,t:-10,h:-5},prostrate:{...KN,hx:-12,hy:-16,t:84,h:10,aFx:60,aFy:-5},
+  hide:{...KN,t:20,h:14,aFx:25,aFy:-48,sg:48,aBx:23,aBy:-69,ab:1}};
+const P={...ST};let staffOn=true;
+const toPose=(name,ms,ease=io)=>ms?tween(P,POSES[name],ms,ease):(cut(P,POSES[name]),Promise.resolve());
+const RT=(a,x,y)=>{a*=Math.PI/180;const c=Math.cos(a),s=Math.sin(a);return[x*c-y*s,x*s+y*c]};
+function ik(ax,ay,bx,by,l1,l2,sg){let dx=bx-ax,dy=by-ay,d=Math.hypot(dx,dy)||.01;const mx=l1+l2-.01;if(d>mx){dx*=mx/d;dy*=mx/d;d=mx;bx=ax+dx;by=ay+dy}
+  const a=(l1*l1-l2*l2+d*d)/(2*d),h=Math.sqrt(Math.max(0,l1*l1-a*a));return[ax+dx/d*a-dy/d*h*sg,ay+dy/d*a+dx/d*h*sg,bx,by]}
+const RG={};['rLegs','rFootB','rFootF','rArmB','rRobe','rHead','rTail','rStaff','rArmF'].forEach(k=>RG[k]=$('#'+k));
+const f1=v=>v.toFixed(1);
+function rig(m){const p=P,wk=m.walk?1:0,w=wk*Math.sin(m.ph),c=wk*Math.cos(m.ph);
+  const th=p.t+m.lean+w*1.5,hx=p.hx+m.lean*.25,hy=p.hy;
+  const fF=[p.fFx+w*8,p.fFy-Math.max(0,c)*3],fB=[p.fBx-w*8,p.fBy-Math.max(0,-c)*3];
+  const u=RT(th,0,-46),N=[hx+u[0],hy+u[1]],sh=RT(th,0,7),S=[N[0]+sh[0],N[1]+sh[1]];
+  const kF=ik(hx,hy,fF[0],fF[1],23,23,-1),kB=ik(hx,hy,fB[0],fB[1],23,23,-1);
+  RG.rLegs.setAttribute('d',`M${f1(hx)},${f1(hy)}L${f1(kB[0])},${f1(kB[1])}L${f1(fB[0])},${f1(fB[1]-4)}M${f1(hx)},${f1(hy)}L${f1(kF[0])},${f1(kF[1])}L${f1(fF[0])},${f1(fF[1]-4)}`);
+  RG.rFootF.setAttribute('cx',f1(fF[0]));RG.rFootF.setAttribute('cy',f1(fF[1]-1));RG.rFootB.setAttribute('cx',f1(fB[0]));RG.rFootB.setAttribute('cy',f1(fB[1]-1));
+  // robe
+  const xs=[fF[0],fB[0]];if(kF[1]>-16)xs.push(kF[0]-7);if(kB[1]>-16)xs.push(kB[0]-7);
+  const a=RT(th,-12,3),b=RT(th,12,3),e=RT(th/2,-21,0),g=RT(th/2,20,0);
+  const Sb=[N[0]+a[0],N[1]+a[1]],Sf=[N[0]+b[0],N[1]+b[1]],Hb=[hx+e[0],hy+e[1]],Hf=[hx+g[0],hy+g[1]];
+  const HB=[Math.min(Math.min(...xs)-14,Hb[0]+2),-2],HF=[Math.max(...xs)+10,-2];
+  const cr=(A,B,C)=>`C${f1(A[0]+(B[0]-A[0])/6)},${f1(A[1]+(B[1]-A[1])/6)} ${f1(B[0]-(C[0]-A[0])/6)},${f1(B[1]-(C[1]-A[1])/6)} ${f1(B[0])},${f1(B[1])}C${f1(B[0]+(C[0]-A[0])/6)},${f1(B[1]+(C[1]-A[1])/6)} ${f1(C[0]-(C[0]-B[0])/6)},${f1(C[1]-(C[1]-B[1])/6)} ${f1(C[0])},${f1(C[1])}`;
+  const k1=RT(th,7,-7),k2=RT(th,-7,-7);
+  RG.rRobe.setAttribute('d',`M${f1(Sb[0])},${f1(Sb[1])}${cr(Sb,Hb,HB)}L${f1(HF[0])},${f1(HF[1])}${cr(HF,Hf,Sf)}C${f1(Sf[0]+k1[0]-7*Math.cos(th*.01745))},${f1(Sf[1]+k1[1])} ${f1(Sb[0]+k2[0]+7*Math.cos(th*.01745))},${f1(Sb[1]+k2[1])} ${f1(Sb[0])},${f1(Sb[1])}Z`);
+  const hc=RT(th+p.h,3,-11);RG.rHead.setAttribute('transform',`translate(${f1(N[0]+hc[0])},${f1(N[1]+hc[1])}) rotate(${f1(th+p.h)})`);RG.rTail.setAttribute('transform',`rotate(${f1(-(th+p.h)*.65)} -9 -1)`);
+  const aF=ik(S[0],S[1],p.aFx+w*3,p.aFy,18,18,1),aB=ik(S[0],S[1],p.aBx,p.aBy,18,18,1);
+  RG.rArmF.setAttribute('d',`M${f1(S[0])},${f1(S[1])}L${f1(aF[0])},${f1(aF[1])}L${f1(aF[2])},${f1(aF[3])}`);
+  RG.rArmB.setAttribute('d',p.ab>.5?`M${f1(S[0])},${f1(S[1])}L${f1(aB[0])},${f1(aB[1])}L${f1(aB[2])},${f1(aB[3])}`:'');
+  RG.rStaff.setAttribute('display',staffOn?'inline':'none');
+  RG.rStaff.setAttribute('transform',`translate(${f1(aF[2])},${f1(aF[3])}) rotate(${f1(p.sa+w*3)}) translate(0,${f1(p.sg-64)})`)}
+
+// stars
+{const r=rng(9),st=$('#stars');for(let i=0;i<40;i++){const s=document.createElement('i'),z=1+r()*1.8;
+  s.style.cssText=`left:${r()*100}%;top:${r()*64}%;width:${z}px;height:${z}px;opacity:${.3+r()*.7}`;
+  if(i%7===0){s.className='tw';s.style.animationDelay=(-r()*3)+'s'}st.appendChild(s)}}
+
+// fire
+const FL=[[0,-64,78,'gCloudR',0],[-24,-50,58,'gCloudR',2],[26,-54,60,'gCloudR',4],[-12,-62,52,'gCloudO',1],[15,-68,54,'gCloudO',3],[0,-90,46,'gCloudO',5],[-7,-54,40,'gCloudY',2.5],[9,-66,38,'gCloudY',.7],[0,-58,28,'gCloudW',1.6]]
+ .map(([x,y,r,g,ph],i)=>({e:el('circle',{r,fill:`url(#${g})`},fireBack),x,y,r,ph,sp:.45+i*.1}));
+FL.push({e:el('circle',{r:34,fill:'url(#gCloudW)',opacity:.4},fireFront),x:0,y:-52,r:34,ph:3,sp:.8});
+const WS=[0,1,2,3].map(i=>({e:el('circle',{r:20,fill:'url(#gCloudO)'},fireBack),age:i*1.1,life:4.4,x:0,ph:i*2}));
+// vision flames + haulers
+const VF=[[-300,330,15,'#7a1410'],[300,340,16,'#7a1410'],[-170,360,11,'#c8321e'],[190,370,12,'#c8321e'],[0,420,13,'#8f1a12'],[-420,300,18,'#4a0d10'],[430,300,18,'#4a0d10']]
+ .map(([x,y,s,fill],i)=>({e:el('use',{href:'#flame',fill,opacity:.85},$('#vFlames')),x,y,s,i}));
+const VH=[-90,-40,10].map((x,i)=>{const g=el('g',{},$('#vHaul'));
+  el('path',{d:'M0,-26 L16,-46','stroke-width':13},g);el('path',{d:'M0,-26 L-12,0 M0,-26 L10,0','stroke-width':7},g);
+  el('circle',{cx:24,cy:-52,r:7.5,stroke:'none'},g);return{g,x,i,fall:0}});
+
+/* ---------- state, tweens ---------- */
+let S, cam, T=0;
+const handS=$('#hand'),faceS=$('#face'),hcam={x:20,y:10,w:780,pw:480},ccam={x:40,y:-30,w:820,pw:500};
+const fcam={x:0,y:-10,w:700,pw:450}, vcam={x:0,y:20,w:640,pw:420};
+const tweens=new Set();
+function tween(o,to,ms,ease=io){return new Promise(res=>{
+  for(const t of tweens)if(t.o===o)for(const k in to)delete t.to[k];
+  const from={};for(const k in to)from[k]=o[k];tweens.add({o,from,to,ms:Math.max(1,ms),ease,t:0,res})})}
+const wait=ms=>tween({},{},ms);
+const cut=(o,p)=>{for(const t of tweens)if(t.o===o)for(const k in p)delete t.to[k];Object.assign(o,p)};
+
+function init(){
+  S={fire:1,flick:1,fireAud:0,wind:.2,holyW:0,black:1,flash:0,path:0,holy:0,whip:18,facet:0,
+     m:{x:572,y:601,f:1,lean:0,hop:0,rim:0,walk:false,ph:0,px:572,sgn:1},
+     sd:[{lift:0,slide:0},{lift:0,slide:0}],
+     h:{p:0,shake:0,curl:0,eye:.5},
+     sn:{on:false,x:0,y:599,a:-92,amp:0,len:104,alive:0}};
+  cam={x:RA,y:430,w:1300,pw:640,shake:0};
+  stage.dataset.t='dusk';setSet('A');toPose('stand');staffOn=true;
+  S.follow=false;S.dir=1;flock.forEach(s=>Object.assign(s,{x:572-s.gap,lx:572-s.gap,f:1,moving:false,gz:false,hd:0}));
+  feet.style.display=vision.style.display=handS.style.display=faceS.style.display='none';skin(0);
+  snakeG.setAttribute('display','none');snake.style.stroke='';sandalsW.setAttribute('display','none');
+  VH.forEach(h=>h.fall=0);
+  $('#again').classList.remove('show');
+  document.querySelectorAll('.ring.on').forEach(r=>r.classList.remove('on'));
+}
+function setSet(n){$('#setA').setAttribute('display',n==='A'?'inline':'none');$('#setB').setAttribute('display',n==='B'?'inline':'none');
+  const mg=n==='A'?aMain:bMain;flock.forEach(s=>mg.appendChild(s.el));mg.appendChild(moses);S.set=n}
+function fit(svg,c){const A=innerWidth/innerHeight,t=clamp((A-.7)/.6,0,1),w=c.pw+(c.w-c.pw)*t,h=w/A;
+  let cx=c.x,cy=c.y-h*.1*(1-t);if(c.shake){cx+=(Math.random()-.5)*c.shake;cy+=(Math.random()-.5)*c.shake}
+  svg.setAttribute('viewBox',`${(cx-w/2).toFixed(2)} ${(cy-h/2).toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)}`)}
+
+function drawSheep(s,dt){
+  if(S.follow){const d=S.m.x-S.dir*s.gap-s.x;if(d*S.dir>(s.moving?2:14)){s.f=S.dir;s.moving=true;s.x+=S.dir*Math.min(Math.abs(d)*3,66)*dt}else s.moving=false}
+  const p=s.p;
+  if(s.moving){s.ph+=Math.abs(s.x-s.lx)*.28;s.gz=false;s.gt=1.2+Math.random()*2.5}
+  else{s.ph+=(Math.round(s.ph/Math.PI)*Math.PI-s.ph)*Math.min(1,dt*8);s.gt-=dt;if(s.gt<0){s.gz=!s.gz;s.gt=s.gz?4+Math.random()*6:1.2+Math.random()*2.5}}
+  s.lx=s.x;
+  const sw=Math.sin(s.ph)*19;p.legs.forEach((l,i)=>l.setAttribute('transform',`rotate(${((i%2?-sw:sw)*(i<2?1:-1)).toFixed(1)} ${l.getAttribute('x1')} ${p.hy})`));
+  s.hd+=((s.gz?1:0)-s.hd)*Math.min(1,dt*3.5);
+  p.head.setAttribute('transform',`rotate(${(s.hd*(80+Math.sin(T*7+s.gap)*3)).toFixed(1)} ${p.px} ${p.py})`);
+  s.el.setAttribute('transform',`translate(${s.x.toFixed(1)},${s.y}) scale(${s.s*s.f},${s.s})`)}
+
+function render(dt){
+  S.flick+=(.72+Math.random()*.56-S.flick)*.16;const fl=S.flick;
+  fit(world,cam);
+  for(const L of LAYERS)L.g.setAttribute('transform',`translate(${((cam.x-L.ref)*(1-L.d)).toFixed(2)},0)`);
+  $('#black').style.opacity=S.black;$('#flash').style.opacity=S.flash;
+  // Moses
+  const m=S.m;let bob=0,sway=0;
+  if(m.walk){m.ph+=Math.abs(m.x-m.px)*.11;const s=Math.sin(m.ph);bob=Math.abs(s)*2.5;sway=s*1.6;
+    if((s>=0?1:-1)!==m.sgn){m.sgn=s>=0?1:-1;nz(.1,{type:'lowpass',f:260,g:.1})}}
+  m.px=m.x;
+  moses.setAttribute('transform',`translate(${m.x.toFixed(2)},${(m.y-bob-m.hop).toFixed(2)})`);
+  inkU.setAttribute('transform',`scale(${m.f},1)`);rimU.setAttribute('transform',`translate(2.6,-.6) scale(${m.f},1)`);
+  rimU.setAttribute('opacity',(m.rim*(.75+.25*fl)).toFixed(3));
+  rig(m);
+  flock.forEach(s=>drawSheep(s,dt));
+  if(S.set==='A'){
+    farHalo.setAttribute('opacity',(.55+.35*fl).toFixed(3));
+    farCore.setAttribute('transform',`translate(${RA+150},302) scale(${(.5+.2*fl).toFixed(3)})`);
+  }else{
+    const lv=S.fire;
+    for(const p of FL){const a=Math.sin(T*p.sp+p.ph),b=Math.cos(T*p.sp*1.3+p.ph*2),k=.72+.28*lv;
+      p.e.setAttribute('cx',(BX+p.x*k+a*7).toFixed(1));p.e.setAttribute('cy',(BY+(p.y+20)*k-20+b*5).toFixed(1));p.e.setAttribute('r',(p.r*k*(1+.07*Math.sin(T*p.sp*2.1+p.ph))).toFixed(1))}
+    for(const p of WS){p.age+=dt;if(p.age>p.life){p.age=0;p.x=(Math.random()*2-1)*26;p.ph=Math.random()*6}
+      const u=p.age/p.life;p.e.setAttribute('cx',(BX+p.x+Math.sin(p.ph+u*3)*12).toFixed(1));p.e.setAttribute('cy',(BY-70-u*95*lv).toFixed(1));
+      p.e.setAttribute('r',(50-22*u).toFixed(1));p.e.setAttribute('opacity',(Math.sin(u*Math.PI)*.38*(1-u*.5)).toFixed(2))}
+    holyW.setAttribute('opacity',(S.holyW*(.8+.2*Math.sin(T*1.6))).toFixed(3));
+    halo.setAttribute('opacity',clamp(.5*lv*(.8+.25*fl),0,1).toFixed(3));halo.setAttribute('r',260+60*lv);
+    gLight.setAttribute('opacity',clamp(.55*lv*fl,0,1).toFixed(3));
+    facet.setAttribute('opacity',clamp(.13*lv*fl,0,.2).toFixed(3));
+    const off=1470*(1-S.path);pathLine.setAttribute('stroke-dashoffset',off);pathGlow.setAttribute('stroke-dashoffset',off);
+    pathGlow.setAttribute('opacity',(.16+.08*Math.sin(T*2)).toFixed(3));
+    // staff / serpent
+    const n=S.sn;if(n.on){const a=n.a*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a);let d='',hx,hy;
+      const bx=n.x+Math.sin(T*1.3)*6*n.alive;
+      for(let s=0;s<=n.len;s+=5){const o=n.amp*Math.sin(s*.15-T*8)*Math.min(1,s/26+.25),px=bx+ca*s-sa*o,py=n.y+sa*s+ca*o;d+=(s?'L':'M')+px.toFixed(1)+','+py.toFixed(1);hx=px;hy=py}
+      snake.setAttribute('d',d);
+      const tg=n.alive>.5&&Math.sin(T*9)>.2;tongue.setAttribute('d',tg?`M${hx+3},${hy} l8,-1 l4,-3 m-4,3 l4,2`:'');
+      snakeRing.setAttribute('cx',bx+50);snakeRing.setAttribute('cy',n.y-4);snakeHit.setAttribute('x',bx-50);snakeHit.setAttribute('y',n.y-70)}
+  }
+  if(feet.style.display!=='none'){fit(feet,fcam);$('#fGlow').setAttribute('opacity',(.6+.3*fl).toFixed(3));
+    $('#holy').setAttribute('opacity',S.holy);$('#holyLine').setAttribute('opacity',S.holy*.9);
+    [['#footNear',-64,42,-11],['#footFar',-132,5,-5]].forEach(([id,dx,dy,rot],i)=>{const s=S.sd[i],f=$(id);
+      f.querySelector('.leg').setAttribute('transform',`translate(0,${(-s.lift*30).toFixed(1)}) rotate(${(-s.lift*7).toFixed(1)})`);
+      f.querySelector('.sandal').setAttribute('transform',`translate(${(s.slide*dx).toFixed(1)},${(s.slide*dy-Math.sin(s.slide*Math.PI)*10).toFixed(1)}) rotate(${(s.slide*rot).toFixed(1)})`)})}
+  if(handS.style.display!=='none'){fit(handS,hcam);const h=S.h,j=h.shake*(Math.random()-.5)*5;
+    $('#hLight').setAttribute('opacity',(.5+.3*fl).toFixed(2));
+    $('#hArm').setAttribute('transform',`translate(${(110-310*h.p+j).toFixed(1)},${(40-105*h.p+j).toFixed(1)}) rotate(${(-18+3*Math.sin(T*.9)*(1-h.p)-6*h.p).toFixed(2)})`);
+    $('#hPalm').setAttribute('transform',`rotate(${(-8*Math.sin(h.p*Math.PI)+2*Math.sin(T*1.3)).toFixed(2)} 60 0)`);
+    $('#hFing').setAttribute('transform',`rotate(${(10*Math.sin(h.p*Math.PI)+h.curl+1.5*Math.sin(T*1.7)).toFixed(2)} -20 0)`);
+    $('#hRing').setAttribute('cx',(60-200*h.p).toFixed(0));$('#hRing').setAttribute('cy',(30-70*h.p).toFixed(0))}
+  if(faceS.style.display!=='none'){fit(faceS,ccam);$('#fcLight').setAttribute('opacity',(.5+.3*fl).toFixed(2));
+    $('#fcEye').setAttribute('transform',`translate(0,${(-58*(1-S.h.eye)).toFixed(1)}) scale(1,${S.h.eye.toFixed(2)})`)}
+  if(vision.style.display!=='none'){fit(vision,vcam);
+    VF.forEach(f=>f.e.setAttribute('transform',`translate(${f.x+Math.sin(T*1.7+f.i)*10},${f.y}) scale(${f.s*(1+.06*Math.sin(T*3+f.i*2))},${f.s*(1+.12*Math.sin(T*2.3+f.i))})`));
+    VH.forEach(h=>h.g.setAttribute('transform',`translate(${h.x+Math.sin(T*2.2+h.i)*3},110) rotate(${(Math.sin(T*2.2+h.i)*4+h.fall*26).toFixed(1)})`));
+    $('#vWhip').setAttribute('transform',`rotate(${S.whip.toFixed(1)} 0 -60)`)}
+  audioFrame(dt);
+}
+let last=0;
+function frame(ts){const dt=Math.min(.05,(ts-(last||ts))/1000);last=ts;T+=dt;
+  for(const t of [...tweens]){t.t+=dt*1000;const u=Math.min(1,t.t/t.ms),e=t.ease(u);for(const k in t.to)t.o[k]=t.from[k]+(t.to[k]-t.from[k])*e;if(u>=1){tweens.delete(t);t.res()}}
+  render(dt);requestAnimationFrame(frame)}
+
+/* ---------- sound: all synthesised ---------- */
+const A={ctx:null,muted:false};
+function audioInit(){const C=window.AudioContext||window.webkitAudioContext;if(!C||A.ctx)return;
+  try{const c=A.ctx=new C();A.master=c.createGain();A.master.gain.value=A.muted?0:1;A.master.connect(c.destination);
+    const len=c.sampleRate*3|0,ir=c.createBuffer(2,len,c.sampleRate);
+    for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3)}
+    A.rev=c.createConvolver();A.rev.buffer=ir;const rg=c.createGain();rg.gain.value=.5;A.rev.connect(rg);rg.connect(A.master);
+    const nl=c.sampleRate*2|0;A.nb=c.createBuffer(1,nl,c.sampleRate);const nd=A.nb.getChannelData(0);for(let i=0;i<nl;i++)nd[i]=Math.random()*2-1;
+    A.wind=loop('bandpass',420,.7);A.roar=loop('lowpass',300,.5);c.resume&&c.resume();
+  }catch(e){A.ctx=null}}
+function loop(type,f,q){const c=A.ctx,s=c.createBufferSource();s.buffer=A.nb;s.loop=true;const fl=c.createBiquadFilter();fl.type=type;fl.frequency.value=f;fl.Q.value=q;
+  const g=c.createGain();g.gain.value=0;s.connect(fl);fl.connect(g);g.connect(A.master);s.start();return{f:fl,g}}
+function send(node,rv){node.connect(A.master);if(rv){const r=A.ctx.createGain();r.gain.value=rv;node.connect(r);r.connect(A.rev)}}
+function env(g,t,peak,a,dur){g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+dur)}
+function nz(dur,{type='bandpass',f=1000,f2,q=1,g=.3,a=.005,rv=0,when=0}={}){if(!A.ctx)return;try{const c=A.ctx,t=c.currentTime+when,s=c.createBufferSource();s.buffer=A.nb;s.loop=true;
+  const fl=c.createBiquadFilter();fl.type=type;fl.Q.value=q;fl.frequency.setValueAtTime(f,t);if(f2)fl.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  const gn=c.createGain();env(gn,t,g,a,dur);s.connect(fl);fl.connect(gn);send(gn,rv);s.start(t,Math.random()*1.5);s.stop(t+dur+.05)}catch(e){}}
+function tn(freq,dur,{type='sine',g=.2,a=.01,f2,rv=0,when=0,trem=0,lp=0}={}){if(!A.ctx)return;try{const c=A.ctx,t=c.currentTime+when,o=c.createOscillator();o.type=type;
+  o.frequency.setValueAtTime(freq,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  const gn=c.createGain();env(gn,t,g,a,dur);let node=o;
+  if(lp){const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=lp;node.connect(f);node=f}
+  if(trem){const tg=c.createGain();tg.gain.value=.6;const l=c.createOscillator();l.frequency.value=trem;const ld=c.createGain();ld.gain.value=.4;l.connect(ld);ld.connect(tg.gain);l.start(t);l.stop(t+dur+.05);node.connect(tg);node=tg}
+  node.connect(gn);send(gn,rv);o.start(t);o.stop(t+dur+.05)}catch(e){}}
+function voice(freqs,dur,{g=.16,a=.5,when=0,vow=[600,1040]}={}){if(!A.ctx)return;try{const c=A.ctx,t=c.currentTime+when,o=c.createGain();
+  o.gain.setValueAtTime(.0001,t);o.gain.linearRampToValueAtTime(g,t+a);o.gain.setValueAtTime(g,t+Math.max(a+.01,dur-.9));o.gain.linearRampToValueAtTime(.0001,t+dur);
+  const fs=vow.map(f=>{const b=c.createBiquadFilter();b.type='bandpass';b.frequency.value=f;b.Q.value=6;b.connect(o);return b});
+  const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=340;const lg=c.createGain();lg.gain.value=.5;lp.connect(lg);lg.connect(o);
+  const l=c.createOscillator();l.frequency.value=4.6;const ld=c.createGain();ld.gain.value=2.2;l.connect(ld);l.start(t);l.stop(t+dur+.1);
+  freqs.forEach(f=>[-7,6].forEach(det=>{const os=c.createOscillator();os.type='sawtooth';os.frequency.value=f;os.detune.value=det;ld.connect(os.frequency);
+    fs.forEach(b=>os.connect(b));os.connect(lp);os.start(t);os.stop(t+dur+.1)}));
+  send(o,.9)}catch(e){}}
+const bleat=(hi)=>tn(hi?520:390,.5,{type:'sawtooth',f2:hi?430:320,g:.07,a:.04,trem:13,lp:1700,rv:.25});
+const chime=()=>[880,1174.7,1318.5,1760].forEach((f,i)=>tn(f,2.4,{g:.045,a:.03,when:i*.09,rv:.8}));
+const rumble=()=>nz(3.2,{type:'lowpass',f:90,g:.9,a:.08,rv:.5});
+function audioFrame(dt){if(!A.ctx)return;
+  const w=S.wind*(.7+.3*Math.sin(T*.37)+.15*Math.sin(T*1.1));A.wind.g.gain.value+=(w-A.wind.g.gain.value)*.04;
+  A.wind.f.frequency.value=400+150*Math.sin(T*.23)+70*Math.sin(T*.71);
+  const r=S.fireAud*S.fire*.3*(.8+.3*S.flick);A.roar.g.gain.value+=(r-A.roar.g.gain.value)*.08;
+  if(Math.random()<dt*14*S.fireAud*S.fire)nz(.03+Math.random()*.04,{type:'highpass',f:1800+Math.random()*3000,g:(.04+Math.random()*.16)*S.fireAud})}
+document.addEventListener('visibilitychange',()=>{if(A.ctx)document.hidden?A.ctx.suspend():A.ctx.resume()});
+$('#mute').addEventListener('click',e=>{A.muted=!A.muted;e.currentTarget.classList.toggle('off',A.muted);if(A.ctx)A.master.gain.value=A.muted?0:1});
+
+/* ---------- touch ---------- */
+stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const r=document.createElement('div');r.className='rip';r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';stage.appendChild(r);setTimeout(()=>r.remove(),600)});
+// wait for a touch on any target; a ring breathes on the thing after a while; a few stray taps also move things on
+function tap(targets,ring,{delay=4500,stray=4}={}){return new Promise(res=>{let n=0;
+  const done=()=>{clearTimeout(tm);targets.forEach(t=>{t.removeEventListener('pointerdown',done);t.classList.remove('live')});stage.removeEventListener('pointerdown',any);ring&&ring.classList.remove('on');res()};
+  const any=e=>{if(e.target.closest('button'))return;if(++n>=stray)done()};
+  const tm=setTimeout(()=>ring&&ring.classList.add('on'),delay);
+  targets.forEach(t=>{t.addEventListener('pointerdown',done);t.classList.add('live')});stage.addEventListener('pointerdown',any)})}
+function sheepTap(s,hi){s.el.addEventListener('pointerdown',e=>{e.stopPropagation();bleat(hi);s.gz=false;s.gt=2.5})}
+flock.forEach((s,i)=>sheepTap(s,i===2));
+
+let wk=0;
+const skin=w=>{const a=$('#hArm').style;a.setProperty('--hb',w?'#cfd6dc':'#8e5a3a');a.setProperty('--hl',w?'#ffffff':'#c98a55');a.setProperty('--hs',w?'#8f9aa6':'#5e3a28')};
+async function walk(x,speed=56){const m=S.m,id=++wk;m.f=S.dir=x>=m.x?1:-1;m.walk=true;await tween(m,{x},Math.abs(x-m.x)/speed*1000,lin);if(id!==wk)return;m.walk=false}
+async function trot(s,x,ms){s.f=x>=s.x?1:-1;s.moving=true;await tween(s,{x},ms,io);s.moving=false}
+
+/* ---------- the story ---------- */
+async function story(){
+  const n=S.sn,m=S.m;
+  // 1 · dusk on the plain. A light on the mountain.
+  await tween(S,{black:0},2600);
+  tween(cam,{x:RA+50},24000,lin);
+  await tap([farHit,mosesHit],farRing,{delay:5000});
+  // 2 · he turns aside to look
+  stage.dataset.t='night';tween(S,{wind:.26},3000);
+  S.follow=true;walk(1180);tween(cam,{x:930},11000);
+  await wait(6200);await tween(S,{black:1},1900);
+  setSet('B');wk++;cut(S.m,{x:5190});flock.forEach(s=>s.x=s.lx=5190-s.gap-20);S.m.rim=.15;S.fireAud=.45;S.wind=.12;
+  cut(cam,{x:RB,y:440,w:1050,pw:640});
+  tween(S,{black:0},2400);tween(S.m,{rim:.6},6500);
+  await walk(5555);S.follow=false;flock.forEach(s=>s.moving=false);
+  tween(S.m,{lean:-6},500,out);
+  tween(S,{fireAud:.8},3500);await tween(cam,{x:5690,y:505,w:700,pw:470},4200);
+  await tap([fireHit],fireRing,{delay:4000});
+  // 3 · the fire answers — twice
+  rumble();tween(cam,{shake:5},200).then(()=>tween(cam,{shake:0},1600));
+  tween(S,{fire:1.55,fireAud:1},500,out).then(()=>tween(S,{fire:1.2},2600));
+  voice([73.4,146.8],.95,{g:.24,a:.12});voice([110,220],1.5,{g:.24,a:.12,when:.8});
+  voice([73.4,146.8],.95,{g:.24,a:.12,when:2.7});voice([110,220],1.9,{g:.24,a:.12,when:3.5});
+  // he backs away; the flock bolts
+  flock.forEach((f,i)=>{f.f=-1;f.moving=true;tween(f,{x:f.x-120-i*14},900+i*120,out).then(()=>{f.moving=false;f.f=1})});
+  m.lean=0;toPose('awe',220,out);m.walk=true;await tween(m,{x:5495},900,out);m.walk=false;await wait(1500);
+  // at the second call he falls on his face; the staff drops beside him
+  staffOn=false;Object.assign(n,{on:true,x:m.x+29,a:-92,amp:0,alive:0});snake.style.stroke='var(--fig)';snakeG.setAttribute('display','inline');
+  tween(n,{a:0},520,inn).then(()=>tn(520,.12,{type:'triangle',g:.2,rv:.3}));
+  await toPose('prostrate',700,inn);nz(.25,{type:'lowpass',f:150,g:.45});
+  await wait(3400);
+  tween(n,{a:-92},1300);await toPose('stand',1400);n.on=false;snakeG.setAttribute('display','none');staffOn=true;
+  tween(m,{rim:.9},600);await wait(500);
+  // 4 · holy ground — the sandals
+  feet.style.display='block';nz(.5,{type:'lowpass',f:200,g:.3});
+  const fN=$('#footNear'),fF=$('#footFar');let off=0;
+  await new Promise(res=>{[[fN,0],[fF,1]].forEach(([f,i])=>{const hit=f.querySelector('.hit'),ring=f.querySelector('.ring');hit.classList.add('live');
+    const tm=setTimeout(()=>ring.classList.add('on'),4000+i*600);
+    hit.addEventListener('pointerdown',async function h(){hit.removeEventListener('pointerdown',h);hit.classList.remove('live');clearTimeout(tm);ring.classList.remove('on');
+      const s=S.sd[i];await tween(s,{lift:1},300,out);nz(.35,{f:900,f2:2600,q:.8,g:.12});await tween(s,{slide:1},520);
+      await tween(s,{lift:0},340,inn);nz(.12,{type:'lowpass',f:180,g:.35});tn(1318.5,1.6,{g:.04,rv:.8});
+      tween(S,{holy:(++off)*.45},900);if(off===2)res()})})});
+  chime();await tween(S,{holy:1},1400);await wait(1500);
+  // 5 · he hides his face; the cry of his people in the fire
+  feet.style.display='none';sandalsW.setAttribute('display','inline');tween(S,{holyW:1},1800);await wait(1100);
+  await walk(5640,30);await wait(400);
+  tween(cam,{x:5725,y:520,w:560,pw:400},2200);await toPose('hide',1100);
+  await wait(1800);
+  voice([73.4,110,146.8,174.6],9.5,{g:.15,a:2.2,vow:[420,900]});
+  tween(S,{fire:1.8},3200);await tween(cam,{x:BX,y:535,w:250,pw:190},3400,inn);
+  await tween(S,{flash:1},350);
+  vision.style.display='block';cut(vcam,{w:640,pw:420});tween(vcam,{w:540,pw:360},8000,lin);S.whip=18;
+  tween(S,{flash:0},900);await wait(2200);
+  const crack=async()=>{await tween(S,{whip:34},380,out);await tween(S,{whip:-34},110,inn);nz(.16,{type:'highpass',f:2400,g:.55,rv:.5});tween(S,{flash:.28},40).then(()=>tween(S,{flash:0},300));await tween(S,{whip:18},700)};
+  await crack();await wait(900);crack();await wait(520);tween(VH[1],{fall:1},500,out);nz(.2,{type:'lowpass',f:160,g:.4});
+  await wait(2300);await tween(S,{flash:1},500);
+  vision.style.display='none';cut(cam,{x:5640,y:480,w:900,pw:600});S.fire=1.25;
+  await tween(S,{flash:0},1400);await wait(700);
+  // 6 · the way back to Egypt
+  voice([73.4,110,146.8,185,220],7,{g:.13,a:1.6});
+  tween(S,{path:1},4200,io);await wait(1500);
+  await toPose('stand',1400);await wait(300);S.m.f=-1;await wait(2000);S.m.f=1;await wait(700);
+  S.m.walk=true;await tween(S.m,{x:5600},1100);S.m.walk=false;
+  for(let i=0;i<2;i++){await tween(S.m,{lean:-5},320);await tween(S.m,{lean:2},320)}tween(S.m,{lean:0},300);
+  // 7 · the staff
+  await tap([mosesHit],staffRing,{delay:3500});
+  staffOn=false;toPose('free',350);Object.assign(n,{on:true,x:5629,a:-92,amp:0,alive:0});snake.style.stroke='var(--fig)';snakeG.setAttribute('display','inline');
+  await tween(n,{a:0},420,inn);tn(620,.12,{type:'triangle',g:.25,rv:.3});tn(410,.14,{type:'triangle',g:.2,when:.11,rv:.3});
+  await wait(900);snake.style.stroke='#93a352';nz(1.6,{type:'highpass',f:5200,g:.16,a:.25});
+  await tween(n,{amp:7,alive:1},900);await wait(250);
+  // only now does he start — a jump, then a few quick steps backwards, still facing it
+  toPose('fear',160,out);await tween(m,{hop:13},150,out);await tween(m,{hop:0},190,inn);
+  m.walk=true;await tween(m,{x:5530},720,out);m.walk=false;
+  const hiss=setInterval(()=>nz(.9,{type:'highpass',f:5200,g:.09,a:.2}),2600);
+  await tap([snakeHit],snakeRing,{delay:3800});clearInterval(hiss);
+  // gingerly: a step, a pause, another; he kneels; a first reach that flinches; then the tail
+  const creep=async x=>{m.walk=true;await tween(m,{x},Math.abs(x-m.x)/20*1000,lin);m.walk=false};
+  toPose('wary',600);await creep(5552);await wait(550);await creep(5570);await wait(450);await creep(5581);await wait(350);
+  await toPose('kneel',1000);await wait(300);
+  await tween(P,{...POSES.reach,t:40,aFx:38,aFy:-22},900);
+  nz(.5,{type:'highpass',f:5200,g:.14,a:.08});tween(n,{amp:10},150).then(()=>tween(n,{amp:7},400));
+  await toPose('flinch',170,out);await wait(850);await toPose('reach',1500);await wait(200);
+  snake.style.stroke='var(--fig)';await tween(n,{amp:0,alive:0},450);chime();
+  tween(n,{a:-92,x:m.x+29},1000);await toPose('stand',1000);
+  n.on=false;snakeG.setAttribute('display','none');staffOn=true;
+  // 7b · the hand: into the cloak, out white as snow; in again, and whole
+  await wait(900);const h=S.h,hHit=$('#hHit'),hRing=$('#hRing');Object.assign(h,{p:0,shake:0,curl:0,eye:.5});skin(0);cut(hcam,{w:780,pw:480});
+  handS.style.display='block';nz(.4,{type:'lowpass',f:200,g:.25});tween(hcam,{w:700,pw:440},14000,lin);
+  const rustle=()=>nz(.5,{f:700,f2:1800,q:.7,g:.1,a:.1});
+  const inOut=async to=>{await tween(h,{p:to?-.07:1.05},260,out);rustle();await tween(h,{p:to},780,io)};
+  await tap([hHit],hRing,{delay:3500,stray:1});await inOut(1);await wait(500);
+  await tap([hHit],hRing,{delay:3000,stray:1});skin(1);await inOut(0);
+  [1975,2093,2960,3136].forEach((f,i)=>tn(f,2.2,{g:.03,a:.02,when:i*.05,rv:.9}));nz(.5,{type:'lowpass',f:120,g:.6,a:.02,rv:.4});
+  tween(h,{shake:1,curl:-10},200);await wait(1100);
+  faceS.style.display='block';h.eye=.5;nz(.28,{f:1500,f2:3200,q:.6,g:.12,a:.1});await tween(h,{eye:1.25},220,out);await wait(1100);
+  faceS.style.display='none';await wait(900);
+  await tap([hHit],hRing,{delay:3000,stray:1});tween(h,{shake:0,curl:0},400);await inOut(1);await wait(500);
+  await tap([hHit],hRing,{delay:3000,stray:1});skin(0);await inOut(0);chime();
+  await tween(h,{curl:14},500);await tween(h,{curl:0},500);await wait(900);
+  handS.style.display='none';
+  // 8 · dawn. He goes.
+  await wait(900);stage.dataset.t='dawn';tween(S,{fire:.85,fireAud:.5,wind:.2},5000);tween(S.m,{rim:.25},5000);
+  tween(cam,{x:5500,y:440,w:1150,pw:700},6000);await wait(3200);
+  await tap([mosesHit,pathHit],staffRing,{delay:4000,stray:3});
+  voice([146.8,220,293.7,370],9,{g:.09,a:2.5,vow:[700,1150]});
+  tween(cam,{x:5480,y:430,w:1300,pw:820},12000);
+  S.follow=true;
+  walk(4860,54);await wait(9000);
+  $('#again').classList.add('show');
+}
+$('#again').addEventListener('click',async()=>{$('#again').classList.remove('show');await tween(S,{black:1},1500);tweens.clear();init();S.black=1;story()});
+$('#start').addEventListener('pointerdown',function go(){this.removeEventListener('pointerdown',go);audioInit();this.style.opacity=0;this.style.pointerEvents='none';setTimeout(()=>this.remove(),1700);story()});
+
+init();requestAnimationFrame(frame);
+window.__dbg={get S(){return S},get cam(){return cam},tweens,pose:n=>toPose(n)};
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+/*
+ * The palette. Each time of day is a handful of flat colours, assigned to
+ * depth bands (far → fore2) plus the figure ink. Changing `data-t` on the
+ * stage cross-fades every card in the world at once.
+ */
+.sky { opacity: 0; transition: opacity var(--pal, 5s) ease-in-out; }
+.sky.dusk  { background: linear-gradient(#2a2748 0%, #6a557c 44%, #e8b98a 72%, #e8b98a 100%); }
+.sky.night { background: linear-gradient(#060a1e 0%, #14224a 58%, #264264 76%, #264264 100%); }
+.sky.dawn  { background: linear-gradient(#3c4c72 0%, #b79aa0 46%, #f6dcae 72%, #f6dcae 100%); }
+.sky.lamp  { background: #1d120f; }
+.sky.dark  { background: #0a0c18; }
+.sky.rdawn { background: linear-gradient(#2e3a5c 0%, #8d7590 38%, #e7a98f 62%, #f4cfa0 76%, #f4cfa0 100%); }
+.sky.rday  { background: linear-gradient(#6f9fb4 0%, #a9c3c2 40%, #e8dcb4 70%, #f3e6bf 100%); }
+#stage[data-t=dusk] .sky.dusk, #stage[data-t=night] .sky.night, #stage[data-t=dawn] .sky.dawn,
+#stage[data-t=lamp] .sky.lamp, #stage[data-t=dark] .sky.dark, #stage[data-t=rdawn] .sky.rdawn, #stage[data-t=rday] .sky.rday { opacity: 1; }
+
+.stars { opacity: 0; transition: opacity 6s; }
+#stage[data-t=night] .stars { opacity: 1; }
+.stars i { position: absolute; border-radius: 50%; background: #dfe6ff; }
+.stars i.tw { animation: tw 3.2s ease-in-out infinite; }
+@keyframes tw { 50% { opacity: .15 } }
+
+#stage[data-t=dusk]  { --far: #c9977a; --mount: #9c6a62; --mid: #7a4c4c; --ground: #553438; --fore1: #3b2430; --fore2: #261724; --fig: #1c1118; --wool: #c9b292; }
+#stage[data-t=night] { --far: #26335a; --mount: #1c2748; --mid: #161d3a; --ground: #11162c; --fore1: #0a0e20; --fore2: #060816; --fig: #04050d; --wool: #6c7594; }
+#stage[data-t=dawn]  { --far: #d3ab92; --mount: #a98274; --mid: #84605a; --ground: #5e4244; --fore1: #3d2a30; --fore2: #291b22; --fig: #1e1318; --wool: #d8c5a4; }
+/* the house in Goshen: lamp-lit, then dark */
+#stage[data-t=lamp]  { --far: #1b2244; --mount: #6a4030; --mid: #4e2e23; --ground: #3a2119; --fore1: #2a1712; --fore2: #1a0e0b; --fig: #140a09; }
+#stage[data-t=dark]  { --far: #121a3a; --mount: #1f2338; --mid: #191c30; --ground: #131628; --fore1: #0d0f1e; --fore2: #080913; --fig: #05060d; }
+/* the Nile: dawn, then the white heat of day */
+#stage[data-t=rdawn] { --far: #9c7c88; --mount: #75627a; --mid: #4a4460; --ground: #3a3249; --fore1: #29233a; --fore2: #1a1626; --fig: #15111c; --water: #6c8597; --glint: #f6d3ae; }
+#stage[data-t=rday]  { --far: #b8ab88; --mount: #8f8a6c; --mid: #4f5e4c; --ground: #6a5642; --fore1: #2f3a2c; --fore2: #20251c; --fig: #1b1813; --water: #2e6c72; --glint: #f6efcf; }
+
+.c-far { fill: var(--far) } .c-mount { fill: var(--mount) } .c-mid { fill: var(--mid) } .c-ground { fill: var(--ground) }
+.c-fore1 { fill: var(--fore1) } .c-fore2 { fill: var(--fore2) } .c-fig { fill: var(--fig) } .c-wool { fill: var(--wool) }
+.s-fig { stroke: var(--fig); fill: none; }
+.ink { fill: var(--fig); stroke: var(--fig); }
+.rim { fill: #f09a3e; stroke: #f09a3e; }
+.c-water { fill: var(--water) } .s-glint { stroke: var(--glint); fill: none; } .c-glint { fill: var(--glint) }
+.c-far, .c-mount, .c-mid, .c-ground, .c-fore1, .c-fore2, .c-fig, .c-wool, .c-water, .c-glint, .s-glint, .ink, .s-fig {
+  transition: fill var(--pal, 5s) ease-in-out, stroke var(--pal, 5s) ease-in-out;
+}
