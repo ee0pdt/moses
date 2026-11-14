@@ -182,6 +182,9 @@ const HUSH = `
         <path d="${LIPS_D}" class="hw" fill="#94493a" opacity="0"/>
         <path d="M77.1,-58 C78.8,-57 79.8,-57 81,-57.5" stroke="#1a0c0a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
       </g>
+      <!-- dark hair framing the forehead and temple, tucked under the veil's edge -->
+      <path d="M86,-198 C70,-203 58,-206 46,-206 C26,-198 10,-178 4,-150 L1,-124 C8,-140 14,-164 28,-182 C40,-195 58,-198 76,-191Z" fill="#0f0907"/>
+      <path d="M22,-180 C16,-160 24,-146 18,-124" stroke="#0f0907" stroke-width="1.6" fill="none" stroke-linecap="round"/>
       <!-- the veil over her head, framing the face -->
       <path d="M46,-206 C26,-198 10,-178 4,-150 C-4,-120 -8,-80 2,-40 C8,-8 2,30 -12,72 L-70,72 C-62,0 -52,-120 -30,-204Z" fill="#211d2c"/>
       <path d="M86,-198 C80,-236 32,-256 -20,-252 C-62,-250 -94,-230 -110,-202 C-62,-218 0,-213 44,-207 C62,-205 76,-201 86,-198Z" fill="#2b2638"/>
