@@ -151,8 +151,8 @@ const HUSH = `
     <path d="M-40,62 C10,30 72,24 104,40 C164,72 214,172 240,420 L-90,420Z" fill="#141220"/>
     <path d="M-40,62 C10,34 60,30 90,36 C60,44 20,52 -20,74Z" fill="#2a2536"/>
     <g id="hHead">
-      <path d="M-7.2,-46 C10,-26 42,-18 56,-21 C58,14 84,40 92,62 L-14,72 C-4,30 0,-10 -0.5,-46Z" fill="#33231d"/>
-      <path d="M56,-21 C58,14 62,40 70,62 L52,64 C46,40 42,10 42,-18Z" class="hw" fill="#7a4626" opacity="0"/>
+      <path d="M-7.2,-46 C10,-28 36,-20 52,-21 C52,4 54,30 58,56 L4,70 C8,30 4,-10 -0.5,-46Z" fill="#33231d"/>
+      <path d="M52,-21 C52,4 54,30 58,56 L46,58 C42,32 40,6 40,-18Z" class="hw" fill="#7a4626" opacity="0"/>
       <path d="${FACE_D}" fill="#4c362e"/>
       <path d="${LIT_D}" fill="#5e4438"/>
       <path d="${FACE_D}" class="hw" fill="#7c4a2c" opacity="0"/>
@@ -191,6 +191,9 @@ const HUSH = `
       <path d="M86,-198 C80,-236 32,-256 -20,-252 L-18,-244 C26,-246 70,-230 78,-200Z" class="hw" fill="#8a5232" opacity="0"/>
       <path d="M-50,-226 C-92,-200 -110,-150 -116,-80 M-14,-214 C-46,-190 -60,-140 -62,-70" stroke="#2e2a3e" stroke-width="5" fill="none" stroke-linecap="round"/>
     </g>
+    <!-- the neckline of her robe, over the base of the neck -->
+    <path d="M-16,76 C12,44 40,34 66,32 C88,31 104,38 114,48 L114,140 L-16,140Z" fill="#141220"/>
+    <path d="M-16,76 C12,44 40,34 66,32 C88,31 104,38 114,48" stroke="#2a2536" stroke-width="5" fill="none"/>
     <g transform="translate(-10,-40)">
     <g id="hBaby">
       <path d="${SWADDLE_D}" fill="#3e3b4c"/>
