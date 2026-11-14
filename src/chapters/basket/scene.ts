@@ -20,14 +20,14 @@ function freshState() {
     // the close-up of the mother's face: look (0 at the baby, 1 to the window), eyeLid (0 open, 1 shut), bow, shh, fuss (the baby)
     look: 0, eyeLid: 0, bow: 0, shh: 0, fuss: 0, warmL: -1,
     // the weaving insert
-    weave: 2, weaving: 0, pitch: 0, babyIn: 0, lid: 0, handOut: 0,
+    weave: 2, weaving: 0, pitch: 0, babyIn: 0, lid: 0, handOut: 0, cradle: 0,
     // the river
     breeze: 1, sun: 0, bOn: false, bx: RB - 130, by: BANK - 18, bob: 0, btilt: 0, bWet: 0, rip: 0,
     // the opening insert
     open: 0, cry: 0, reach: 0, grip: 0,
     // the cast
     mo: motion(-70, 604, 1, .55),        // Jochebed, his mother
-    mi: motion(-178, 604, 1, .5),         // Miriam, his sister
+    mi: motion(34, 606, -1, .5),          // Miriam, his sister, on the mat facing her mother
     // the patrol (x is set from `patrol` each frame)
     so: [motion(0, STREET, 1), motion(0, STREET, 1), motion(0, STREET, 1)],
     pr: motion(RB + 1500, BANK, -1, 0),   // Pharaoh's daughter
@@ -66,7 +66,7 @@ export function createScene(ctx: ChapterCtx) {
     cam: { x: RA, y: 480, w: 780, pw: 600 } as Cam,
     wcam: { x: 0, y: 20, w: 760, pw: 470 } as Cam,
     ocam: { x: 20, y: -10, w: 740, pw: 470 } as Cam,
-    hcam: { x: 30, y: -36, w: 640, pw: 440 } as Cam,
+    hcam: { x: 30, y: -72, w: 650, pw: 440 } as Cam,
 
     setSet(n: 'A' | 'B') {
       at(W.setA, 'display', n === 'A' ? 'inline' : 'none');
@@ -173,7 +173,10 @@ export function createScene(ctx: ChapterCtx) {
         at(I.wPitchR, 'width', (430 * S.pitch).toFixed(1));
         at(I.wRimW, 'opacity', clamp(S.weave - 4, 0, 1).toFixed(2));
         at(I.wRimP, 'opacity', S.pitch.toFixed(2));
-        at(I.wBaby, 'transform', `translate(0,${(-420 * (1 - S.babyIn) - 34 * S.babyIn).toFixed(1)}) rotate(${(Math.sin(T * 1.4) * 3 * (1 - S.babyIn)).toFixed(2)})`);
+        // he is lowered in by his mother's hands (hidden until then, so he never hangs in the air on a tall screen)
+        const by = -760 * (1 - S.babyIn) - 34 * S.babyIn, c = S.cradle;
+        at(I.wBaby, 'display', S.babyIn > 0 || c > 0 ? 'inline' : 'none');
+        at(I.wBaby, 'transform', `translate(0,${by.toFixed(1)}) rotate(${(Math.sin(T * 1.4) * 3 * (1 - S.babyIn)).toFixed(2)})`);
         at(I.wLid, 'transform', `translate(0,${(-600 * (1 - S.lid)).toFixed(1)})`);
         at(I.wGlow, 'opacity', (.8 + .2 * fl).toFixed(3));
         // the weaving hand follows the row being woven; then the daubing; then it withdraws
@@ -182,8 +185,9 @@ export function createScene(ctx: ChapterCtx) {
         let hx = front + 70 + Math.sin(T * 7) * 7 * S.weaving, hy = ry - 24 + Math.cos(T * 7) * 6 * S.weaving;
         if (S.pitch > 0) { hx = -200 + 430 * S.pitch + 60; hy = 40 + Math.sin(T * 8) * 34 * (S.pitch < 1 ? 1 : 0); }
         hx += S.handOut * 700; hy += S.handOut * 200;
-        at(I.wHandR, 'transform', `translate(${hx.toFixed(1)},${hy.toFixed(1)})`);
-        at(I.wHandL, 'transform', `translate(${(-S.handOut * 600).toFixed(1)},${(Math.sin(T * 1.2) * 3 + S.handOut * 200).toFixed(1)})`);
+        at(I.wHandR, 'transform', `translate(${(hx + (168 - hx) * c).toFixed(1)},${(hy + (by + 18 - hy) * c).toFixed(1)})`);
+        const lx = -S.handOut * 600, ly = Math.sin(T * 1.2) * 3 + S.handOut * 200;
+        at(I.wHandL, 'transform', `translate(${(lx + (100 - lx) * c).toFixed(1)},${(ly + (by - 40 - ly) * c).toFixed(1)})`);
         const sx = hx - 58, sy = hy + 10;
         at(I.wStrand, 'd', S.weave < 5 && S.pitch === 0 ? `M${front.toFixed(1)},${ry} Q${((front + sx) / 2).toFixed(1)},${(ry + 26).toFixed(1)} ${sx.toFixed(1)},${sy.toFixed(1)}` : '');
       }
