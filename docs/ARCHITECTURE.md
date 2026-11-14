@@ -78,7 +78,10 @@ re-rasterises changed regions every frame.
    renderer in `scene.ts`, the script in `story.ts`, sound cues in `sfx.ts`.
 3. Build people with `createFigure(defs, { head, prop, scale, rim })` using
    `HEADS`/`PROPS` from `characters/moses.ts`; move them with `walkTo()`;
-   add poses to `POSES` in `characters/figure.ts`.
+   add poses to `POSES` in `characters/figure.ts`. `belly` fills out the front
+   of the robe; `fig.hand` is where the front hand was last drawn (e.g. to hang
+   a torch's glow on it); `fig.part('flame')` finds a `data-r` part of the head
+   or prop art to animate (look it up once, at build time).
 4. Give it a `cover` (a 160×120 SVG tile) and add it to `src/chapters/index.ts`.
    It then appears in the menu and at `#<id>`, and the smoke test plays it.
 5. Time-of-day palettes live in `styles/palette.css` (`data-t` on the stage);

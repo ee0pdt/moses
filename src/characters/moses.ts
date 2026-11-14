@@ -11,6 +11,8 @@ export const HEADS = {
   girl: `<circle r="10"/><path d="M-10,-2 C-11,-13 5,-15 10,-6 C4,-8 -2,-6 -4,-1Z"/><path data-r="tail" d="M-9,-3 C-7,-2 -6,0 -7,1 C-10,8 -11,14 -9,21 C-15,14 -14,3 -9,-3Z"/>`,
   /** Egyptian court wig: blunt bob, straight fringe, a lotus at the brow. */
   princess: `<circle r="9.5"/><path d="M-12,-3 C-13,-15 8,-18 12,-7 L12,-5 L3,-5 C1,-5 -1,-3 -1,0 L-1,15 L-13,15 C-14,8 -13,2 -12,-3Z"/><path d="M8,-11 L9,-19 L11.5,-13 L14,-18 L13.5,-10Z"/>`,
+  /** An Egyptian soldier: a padded helmet with a neck guard. */
+  soldier: `<circle r="9.5"/><path d="M-11,-2 C-12,-15 7,-18 11,-6 L12,-3 L4,-4 C1,-4 -1,-2 -2,2 L-3,10 L-12,9 C-13,5 -12,1 -11,-2Z"/><path d="M-6,-14 L-2,-21 L4,-15Z"/>`,
   maid: `<circle r="9.5"/><path d="M-12,-3 C-13,-15 8,-18 12,-7 L12,-5 L3,-5 C1,-5 -1,-3 -1,0 L-1,7 L-13,7 C-14,4 -13,0 -12,-3Z"/>`,
 };
 
@@ -18,6 +20,9 @@ export const PROPS = {
   staff: `<path d="M2.5,64 L-1.5,-44 C-1.5,-56 10.5,-55 9.5,-45" stroke-width="3.6" fill="none" stroke-linecap="round"/>`,
   bundle: `<g transform="translate(-5,-6) rotate(-14)"><ellipse rx="13" ry="6.5"/><circle cx="12" cy="-3" r="4.6"/></g>`,
   basket: `<g transform="translate(-4,-4)"><path d="M-18,-6 L18,-6 C17,4 10,8 0,8 C-10,8 -17,4 -18,-6Z"/><path d="M-17,-7 C-10,-14 10,-14 17,-7Z"/></g>`,
+  spear: `<path d="M0,40 L0,-96" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M0,-112 L-3.6,-98 L0,-94 L3.6,-98Z"/>`,
+  /** A pitch torch; its `data-r="flame"` is animated by the scene. */
+  torch: `<path d="M-1,22 L1,-20" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M-4,-17 L4,-17 L5,-25 L-5,-25Z"/><use data-r="flame" href="#flame" fill="#ffd27a" stroke="none" transform="translate(0,-28) scale(.6)"/>`,
   fan: `<path d="M0,44 L0,-58" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M0,-56 C-14,-64 -17,-84 0,-94 C17,-84 14,-64 0,-56Z"/>`,
 };
 

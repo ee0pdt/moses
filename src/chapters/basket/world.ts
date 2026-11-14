@@ -4,6 +4,8 @@ import { ridge, blob } from '../../art/shapes';
 
 /** World units. Set A (the house) is centred on RA, set B (the Nile) on RB. Ground lines: house 600, riverbank 632. */
 export const RA = 0, RB = 5000, BANK = 632, WATER = 618;
+/** The lamp in its niche: the flame sits at (LAMP_X, LAMP_Y). Soldiers in the street stand at STREET (below the window sill). */
+export const LAMP_DY = 56, LAMP_X = -240, LAMP_Y = 457 + LAMP_DY, STREET = 514;
 /** Front reed clumps along the bank: Miriam's two hiding places, and where the basket comes to rest. */
 export const HIDE1 = RB - 40, HIDE2 = RB + 200, REST = RB + 440;
 
@@ -60,30 +62,23 @@ export function buildWorld(world: SVGSVGElement) {
   const moonShade = el('circle', { r: 11, class: 'c-far' }, moon);
   const winDawn = el('rect', { x: 150, y: 380, width: 140, height: 90, fill: '#f4cfa0', opacity: 0 }, winG);
   const torchGlow = el('circle', { cx: 0, cy: 430, r: 90, fill: 'url(#gTorch)', opacity: 0 }, winG);
-  const patrol = el('g', { fill: '#040306' }, winG);
-  [[0, 0], [52, 4], [100, -2]].forEach(([dx, dy]) => {
-    const s = el('g', { transform: `translate(${dx},${dy})` }, patrol);
-    el('path', { d: 'M-16,470 L-12,446 C-10,438 10,438 12,446 L16,470Z' }, s);          // shoulders
-    el('circle', { cx: 0, cy: 432, r: 8 }, s);                                           // head
-    el('path', { d: 'M-9,430 C-9,418 9,418 9,430 L12,438 L-12,438Z' }, s);               // helmet
-    el('path', { d: 'M12,470 L16,384 L19,384 L15,470Z M17.5,384 L14,394 L21,394Z' }, s); // spear
-  });
-  const torchFl = el('use', { href: '#flame', fill: '#ffd27a', transform: 'translate(-24,404) scale(.55)' }, patrol);
-  el('path', { d: 'M-24,408 L-21,450', stroke: '#040306', 'stroke-width': 3 }, patrol);
+  // the patrol: rigged soldiers are added by the scene; they walk the street below the sill
+  const patrol = el('g', {}, winG);
   el('path', { d: 'M136,366 L304,366 L304,484 L136,484Z M150,380 L150,470 L290,470 L290,380Z', 'fill-rule': 'evenodd', class: 'c-fore1' }, aWall);
   el('rect', { x: 128, y: 470, width: 184, height: 12, class: 'c-fore2' }, aWall);
   // doorway and curtain
   card(aWall, 'M-600,606 L-600,430 Q-545,385 -490,430 L-490,606Z', 'c-fore2');
   card(aWall, 'M-596,432 Q-560,404 -540,412 L-548,520 Q-560,560 -590,606 L-596,606Z', 'c-fore1');
-  // the lamp in its niche
-  card(aWall, 'M-302,474 L-302,432 Q-262,396 -222,432 L-222,474Z', 'c-fore1');
-  el('rect', { x: -312, y: 472, width: 100, height: 9, class: 'c-fore2' }, aWall);
-  const lampGlow = el('circle', { cx: -262, cy: 452, r: 460, fill: 'url(#gLamp)' }, aWall);
-  card(aWall, 'M-286,472 C-284,462 -258,458 -246,462 L-236,457 L-238,465 C-240,470 -250,472 -286,472Z', 'c-fig');
-  const lampFl = el('use', { href: '#flame', fill: '#ffd27a' }, aWall);
-  const smoke = el('path', { d: 'M-238,452 C-232,436 -246,424 -238,408 C-232,396 -244,386 -238,372', stroke: '#b8b0c8', 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round', opacity: 0 }, aWall);
-  const lampHit = el('circle', { cx: -260, cy: 455, r: 80, class: 'hit' }, aWall);
-  const lampRing = el('circle', { cx: -260, cy: 455, r: 44, class: 'ring' }, aWall);
+  // the lamp in its niche, low enough for a girl on tiptoe to reach
+  const lampG = el('g', { transform: `translate(0,${LAMP_DY})` }, aWall);
+  card(lampG, 'M-302,474 L-302,432 Q-262,396 -222,432 L-222,474Z', 'c-fore1');
+  el('rect', { x: -312, y: 472, width: 100, height: 9, class: 'c-fore2' }, lampG);
+  const lampGlow = el('circle', { cx: -262, cy: 452, r: 460, fill: 'url(#gLamp)' }, lampG);
+  card(lampG, 'M-286,472 C-284,462 -258,458 -246,462 L-236,457 L-238,465 C-240,470 -250,472 -286,472Z', 'c-fig');
+  const lampFl = el('use', { href: '#flame', fill: '#ffd27a' }, lampG);
+  const smoke = el('path', { d: 'M-238,452 C-232,436 -246,424 -238,408 C-232,396 -244,386 -238,372', stroke: '#b8b0c8', 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round', opacity: 0 }, lampG);
+  const lampHit = el('circle', { cx: -260, cy: 455, r: 80, class: 'hit' }, lampG);
+  const lampRing = el('circle', { cx: -260, cy: 455, r: 44, class: 'ring' }, lampG);
 
   const aMain = layer(setA, 1, RA);
   card(aMain, 'M-2200,600 L2200,600 L2200,3000 L-2200,3000Z', 'c-ground');
@@ -145,7 +140,7 @@ export function buildWorld(world: SVGSVGElement) {
   return {
     layers, clumps, setA, setB,
     // A
-    aFigs, winSky, moon, moonShade, winDawn, torchGlow, patrol, torchFl, lampGlow, lampFl, smoke, lampHit, lampRing, lampPool, beam, patch,
+    aFigs, winSky, moon, moonShade, winDawn, torchGlow, patrol, lampGlow, lampFl, smoke, lampHit, lampRing, lampPool, beam, patch,
     // B
     bFigs, bank, glints, sun, sunWash, basketW, basketBody, ripple, lip, basketHit, basketRing,
   };
@@ -170,6 +165,9 @@ export function buildInserts(scene: HTMLElement) {
     rows, wBaby: q('#wBaby'), wLid: q('#wLid'), wPitchR: q('#wPitchR'), wRimW: q('#wRimW'), wRimP: q('#wRimP'),
     wHandR: q('#wHandR'), wHandL: q('#wHandL'), wStrand: q('#wStrand'), wGlow: q('#wGlow'), wRing: q('#wRing'), wHit: q('#wHit'),
     oLid: q('#oLid'), oMouth: q('#oMouth'), oTears: q('#oTears'), oFist: q('#oFist'), oEyes: q('#oEyes'), oHand: q('#oHand'),
+    hush: q<SVGSVGElement>('#hush'), hPatch: q('#hPatch'), hMa: q('#hMa'), hHead: q('#hHead'), hIris: q('#hIris'), hLid: q('#hLid'), hLips: q('#hLips'),
+    hBaby: q('#hBaby'), hBabyMouth: q('#hBabyMouth'), hBabyBrow: q('#hBabyBrow'), hHand: q('#hHand'),
+    hWarm: [...scene.querySelectorAll<SVGElement>('#hush .hw')],
     oLidRing: q('#oLidRing'), oLidHit: q('#oLidHit'), oBabyRing: q('#oBabyRing'), oBabyHit: q('#oBabyHit'),
   };
 }
